@@ -1,5 +1,5 @@
-use crate::actions::Actions;
-use crate::loading::AudioAssets;
+use crate::plugins::actions::Actions;
+use crate::plugins::loading::AudioAssets;
 use crate::GameState;
 use bevy::prelude::*;
 use bevy_kira_audio::{Audio, AudioPlugin};
