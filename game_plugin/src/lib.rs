@@ -2,7 +2,7 @@ use bevy::app::AppBuilder;
 // #[cfg(debug_assertions)]
 // use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
-use plugins::actions::ActionsPlugin;
+use plugins::actions_old::ActionsPlugin;
 use plugins::audio::InternalAudioPlugin;
 use plugins::loading::LoadingPlugin;
 use plugins::menu::MenuPlugin;
@@ -37,7 +37,8 @@ impl Plugin for GamePlugin {
             .add_plugin(ActionsPlugin)
             .add_plugin(InternalAudioPlugin)
             .add_plugin(PlayerPlugin)
-            .add_plugin(MyInputPlugin);
+            .add_plugin(MyInputPlugin)
+            .add_plugin(MovementPlugin);
 
         // #[cfg(debug_assertions)]
         // {

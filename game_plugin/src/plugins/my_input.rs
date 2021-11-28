@@ -21,14 +21,14 @@ impl Plugin for MyInputPlugin {
 }
 
 fn on_enter() {
-    MyInputPlugin.debug("on_enter");
-    MyInputPlugin.info("on_enter");
-    MyInputPlugin.warn("on_enter");
-    MyInputPlugin.error("on_enter");
+    MyInputPlugin.log_debug("on_enter");
+    MyInputPlugin.log_info("on_enter");
+    MyInputPlugin.log_warn("on_enter");
+    MyInputPlugin.log_error("on_enter");
 }
 
 fn on_exit() {
-    MyInputPlugin.debug("on_exit");
+    MyInputPlugin.log_debug("on_exit");
 }
 
 fn on_tick(mut input_events: EventReader<KeyboardInput>) {
@@ -40,5 +40,5 @@ fn on_tick(mut input_events: EventReader<KeyboardInput>) {
 }
 
 fn on_key_pressed(key: &KeyboardInput) {
-    MyInputPlugin.info(format!("keyPressed={:?}", key.key_code.unwrap()).as_str());
+    MyInputPlugin.log_info(format!("keyPressed={:?}", key.key_code.unwrap()).as_str());
 }

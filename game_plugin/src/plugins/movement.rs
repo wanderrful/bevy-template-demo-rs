@@ -4,7 +4,9 @@ use crate::GameState;
 use crate::utils::Loggable;
 
 pub struct MovementPlugin;
-pub struct MovementEvent;
+
+/// Broadcast a MovementEvent to mutate an Actor's Transform!
+pub struct MovementEvent(Entity);
 
 impl Plugin for MovementPlugin {
     fn build(&self, app: &mut AppBuilder) {
@@ -19,13 +21,15 @@ impl Plugin for MovementPlugin {
 }
 
 fn on_enter() {
-    MovementPlugin.debug("hello");
+    MovementPlugin.log_debug("on_enter");
 }
 
 fn on_exit() {
-    MovementPlugin.debug("goodbye");
+    MovementPlugin.log_debug("on_exit");
 }
 
 fn on_tick(mut movement_events: EventReader<MovementEvent>) {
-
+    for e in movement_events.iter() {
+        MovementPlugin.log_info("Movement event detected!");
+    }
 }

@@ -1,4 +1,4 @@
-use crate::plugins::actions::Actions;
+use crate::plugins::actions_old::Actions;
 use crate::plugins::loading::TextureAssets;
 use crate::GameState;
 use bevy::prelude::*;
