@@ -2,6 +2,13 @@ use crate::plugins::loading::FontAssets;
 use crate::GameState;
 use bevy::prelude::*;
 
+pub struct PlayButton;
+
+pub struct ButtonMaterials {
+    pub normal: Handle<ColorMaterial>,
+    pub hovered: Handle<ColorMaterial>,
+}
+
 pub struct MenuPlugin;
 
 /// This plugin is responsible for the game menu (containing only one button...)
@@ -60,13 +67,6 @@ fn click_play_button(
             }
         }
     }
-}
-
-pub struct PlayButton;
-
-pub struct ButtonMaterials {
-    pub normal: Handle<ColorMaterial>,
-    pub hovered: Handle<ColorMaterial>,
 }
 
 impl FromWorld for ButtonMaterials {

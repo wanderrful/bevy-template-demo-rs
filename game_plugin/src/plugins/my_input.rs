@@ -2,9 +2,7 @@ use bevy::input::keyboard::KeyboardInput;
 use bevy::prelude::*;
 
 use crate::GameState;
-use crate::utils::Logger;
-
-const LOGGER: Logger = Logger::new("MyInputPlugin");
+use crate::utils::Loggable;
 
 /// Represents the Input handler for the Playing GameState.
 pub struct MyInputPlugin;
@@ -13,8 +11,7 @@ impl Plugin for MyInputPlugin {
     fn build(&self, app: &mut AppBuilder) {
         const GAME_STATE: GameState = GameState::Playing;
 
-        app
-            .add_system_set(SystemSet::on_enter(GAME_STATE)
+        app.add_system_set(SystemSet::on_enter(GAME_STATE)
                 .with_system(on_enter.system()))
             .add_system_set(SystemSet::on_update(GAME_STATE)
                 .with_system(on_tick.system()))
@@ -24,11 +21,14 @@ impl Plugin for MyInputPlugin {
 }
 
 fn on_enter() {
-    LOGGER.debug("on enter");
+    MyInputPlugin.debug("on_enter");
+    MyInputPlugin.info("on_enter");
+    MyInputPlugin.warn("on_enter");
+    MyInputPlugin.error("on_enter");
 }
 
 fn on_exit() {
-    LOGGER.debug("on exit");
+    MyInputPlugin.debug("on_exit");
 }
 
 fn on_tick(mut input_events: EventReader<KeyboardInput>) {
@@ -40,5 +40,5 @@ fn on_tick(mut input_events: EventReader<KeyboardInput>) {
 }
 
 fn on_key_pressed(key: &KeyboardInput) {
-    LOGGER.debug(format!("keyPressed={:?}", key.key_code.unwrap()).as_str());
+    MyInputPlugin.info(format!("keyPressed={:?}", key.key_code.unwrap()).as_str());
 }

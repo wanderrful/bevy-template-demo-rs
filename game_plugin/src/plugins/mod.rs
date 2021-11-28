@@ -4,3 +4,4 @@ pub mod audio;
 pub mod actions;
 pub mod menu;
 pub mod player;
+pub mod movement;

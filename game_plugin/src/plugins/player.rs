@@ -16,7 +16,8 @@ impl Plugin for PlayerPlugin {
                 .with_system(spawn_player.system())
                 .with_system(spawn_camera.system()),
         )
-        .add_system_set(SystemSet::on_update(GameState::Playing).with_system(move_player.system()));
+            .add_system_set(SystemSet::on_update(GameState::Playing)
+                .with_system(move_player.system()));
     }
 }
 
@@ -29,12 +30,11 @@ fn spawn_player(
     textures: Res<TextureAssets>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    commands
-        .spawn_bundle(SpriteBundle {
-            material: materials.add(textures.texture_bevy.clone().into()),
-            transform: Transform::from_translation(Vec3::new(0., 0., 1.)),
-            ..Default::default()
-        })
+    commands.spawn_bundle(SpriteBundle {
+        material: materials.add(textures.texture_bevy.clone().into()),
+        transform: Transform::from_translation(Vec3::new(0., 0., 1.)),
+        ..Default::default()
+    })
         .insert(Player);
 }
 

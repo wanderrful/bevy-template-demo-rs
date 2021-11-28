@@ -8,6 +8,7 @@ use plugins::loading::LoadingPlugin;
 use plugins::menu::MenuPlugin;
 use plugins::my_input::MyInputPlugin;
 use plugins::player::PlayerPlugin;
+use plugins::movement::MovementPlugin;
 
 mod plugins;
 mod ui;

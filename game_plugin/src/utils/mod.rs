@@ -1,3 +1,3 @@
 mod logging;
 
-pub use logging::Logger;
+pub use logging::Loggable;
