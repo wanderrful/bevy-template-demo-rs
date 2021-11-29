@@ -12,10 +12,10 @@ impl Plugin for InternalAudioPlugin {
         app.add_plugin(AudioPlugin)
             .add_system_set(
                 SystemSet::on_enter(GameState::Playing).with_system(start_audio.system()),
-            )
-            .add_system_set(
-                SystemSet::on_update(GameState::Playing).with_system(control_flying_sound.system()),
             );
+            // .add_system_set(
+            //     SystemSet::on_update(GameState::Playing).with_system(control_flying_sound.system()),
+            // );
     }
 }
 

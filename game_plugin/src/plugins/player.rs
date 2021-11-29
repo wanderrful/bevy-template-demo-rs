@@ -2,6 +2,7 @@ use crate::plugins::actions_old::Actions;
 use crate::plugins::loading::TextureAssets;
 use crate::GameState;
 use bevy::prelude::*;
+use crate::plugins::actions::{MoveForward, MoveStrafe};
 
 pub struct PlayerPlugin;
 
@@ -40,19 +41,21 @@ fn spawn_player(
 
 fn move_player(
     time: Res<Time>,
-    actions: Res<Actions>,
+    // actions: Res<Actions>,
     mut player_query: Query<&mut Transform, With<Player>>,
+    mut move_forward: EventReader<MoveForward>,
+    mut move_strafe: EventReader<MoveStrafe>
 ) {
-    if actions.player_movement.is_none() {
-        return;
-    }
-    let speed = 150.;
-    let movement = Vec3::new(
-        actions.player_movement.unwrap().x * speed * time.delta_seconds(),
-        actions.player_movement.unwrap().y * speed * time.delta_seconds(),
-        0.,
-    );
-    for mut player_transform in player_query.iter_mut() {
-        player_transform.translation += movement;
-    }
+    // if actions.player_movement.is_none() {
+    //     return;
+    // }
+    // let speed = 150.;
+    // let movement = Vec3::new(
+    //     actions.player_movement.unwrap().x * speed * time.delta_seconds(),
+    //     actions.player_movement.unwrap().y * speed * time.delta_seconds(),
+    //     0.,
+    // );
+    // for mut player_transform in player_query.iter_mut() {
+    //     player_transform.translation += movement;
+    // }
 }

@@ -3,6 +3,7 @@ use bevy::prelude::*;
 
 use crate::GameState;
 use crate::utils::Loggable;
+use crate::plugins::actions::{MoveForward, MoveStrafe};
 
 /// Represents the Input handler for the Playing GameState.
 pub struct MyInputPlugin;
@@ -14,7 +15,7 @@ impl Plugin for MyInputPlugin {
         app.add_system_set(SystemSet::on_enter(GAME_STATE)
                 .with_system(on_enter.system()))
             .add_system_set(SystemSet::on_update(GAME_STATE)
-                .with_system(on_tick.system()))
+                .with_system(on_update.system()))
             .add_system_set(SystemSet::on_exit(GAME_STATE)
                 .with_system(on_exit.system()));
     }
@@ -22,23 +23,47 @@ impl Plugin for MyInputPlugin {
 
 fn on_enter() {
     MyInputPlugin.log_debug("on_enter");
-    MyInputPlugin.log_info("on_enter");
-    MyInputPlugin.log_warn("on_enter");
-    MyInputPlugin.log_error("on_enter");
 }
 
 fn on_exit() {
     MyInputPlugin.log_debug("on_exit");
 }
 
-fn on_tick(mut input_events: EventReader<KeyboardInput>) {
-    input_events.iter().for_each(|key: &KeyboardInput|
-        match key.state.is_pressed() {
-            true => { on_key_pressed(key) },
-            false => { }
-        });
-}
+fn on_update(mut keyboard_input: EventReader<KeyboardInput>,
+             mut move_forward: EventWriter<MoveForward>,
+             mut move_strafe: EventWriter<MoveStrafe>) {
+    keyboard_input.iter().for_each(|key: &KeyboardInput| {
+        let key_code: KeyCode = key.key_code.unwrap();
+        let is_pressed: bool = key.state.is_pressed();
 
-fn on_key_pressed(key: &KeyboardInput) {
-    MyInputPlugin.log_info(format!("keyPressed={:?}", key.key_code.unwrap()).as_str());
+        match key_code {
+            KeyCode::W => {
+                move_forward.send(MoveForward {
+                    scale: if is_pressed { 1.0 } else { 0.0 }
+                })
+            },
+            KeyCode::S => {
+                move_forward.send(MoveForward {
+                    scale: if is_pressed { -1.0 } else { 0.0 }
+                })
+            },
+            KeyCode::A => {
+                move_strafe.send(MoveStrafe {
+                    scale: if is_pressed { -1.0 } else { 0.0 }
+                })
+            },
+            KeyCode::D => {
+                move_strafe.send(MoveStrafe {
+                    scale: if is_pressed { 1.0 } else { 0.0 }
+                })
+            }
+            default => {
+                MyInputPlugin.log_info(format!(
+                    "event={} input={:?}",
+                    if is_pressed {"keyPressed"} else {"keyReleased"},
+                    key_code
+                ).as_str());
+            }
+        }
+    });
 }
