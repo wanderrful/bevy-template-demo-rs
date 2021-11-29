@@ -1,4 +1,3 @@
-use crate::plugins::actions_old::Actions;
 use crate::plugins::loading::TextureAssets;
 use crate::GameState;
 use bevy::prelude::*;
@@ -16,9 +15,7 @@ impl Plugin for PlayerPlugin {
             SystemSet::on_enter(GameState::Playing)
                 .with_system(spawn_player.system())
                 .with_system(spawn_camera.system()),
-        )
-            .add_system_set(SystemSet::on_update(GameState::Playing)
-                .with_system(move_player.system()));
+        );
     }
 }
 
@@ -37,25 +34,4 @@ fn spawn_player(
         ..Default::default()
     })
         .insert(Player);
-}
-
-fn move_player(
-    time: Res<Time>,
-    // actions: Res<Actions>,
-    mut player_query: Query<&mut Transform, With<Player>>,
-    mut move_forward: EventReader<MoveForward>,
-    mut move_strafe: EventReader<MoveStrafe>
-) {
-    // if actions.player_movement.is_none() {
-    //     return;
-    // }
-    // let speed = 150.;
-    // let movement = Vec3::new(
-    //     actions.player_movement.unwrap().x * speed * time.delta_seconds(),
-    //     actions.player_movement.unwrap().y * speed * time.delta_seconds(),
-    //     0.,
-    // );
-    // for mut player_transform in player_query.iter_mut() {
-    //     player_transform.translation += movement;
-    // }
 }

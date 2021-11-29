@@ -6,9 +6,9 @@ use crate::utils::Loggable;
 use crate::plugins::actions::{MoveForward, MoveStrafe};
 
 /// Represents the Input handler for the Playing GameState.
-pub struct MyInputPlugin;
+pub struct InputPlugin;
 
-impl Plugin for MyInputPlugin {
+impl Plugin for InputPlugin {
     fn build(&self, app: &mut AppBuilder) {
         const GAME_STATE: GameState = GameState::Playing;
 
@@ -22,19 +22,24 @@ impl Plugin for MyInputPlugin {
 }
 
 fn on_enter() {
-    MyInputPlugin.log_debug("on_enter");
+    InputPlugin.log_debug("on_enter");
 }
 
 fn on_exit() {
-    MyInputPlugin.log_debug("on_exit");
+    InputPlugin.log_debug("on_exit");
 }
 
-fn on_update(mut keyboard_input: EventReader<KeyboardInput>,
-             mut move_forward: EventWriter<MoveForward>,
-             mut move_strafe: EventWriter<MoveStrafe>) {
+fn on_update(
+    mut keyboard_input: EventReader<KeyboardInput>,
+    mut move_forward: EventWriter<MoveForward>,
+    mut move_strafe: EventWriter<MoveStrafe>
+) {
     keyboard_input.iter().for_each(|key: &KeyboardInput| {
         let key_code: KeyCode = key.key_code.unwrap();
         let is_pressed: bool = key.state.is_pressed();
+
+        InputPlugin.log_debug(
+            format!("keyCode={:?} isPressed={}", key_code, is_pressed).as_str());
 
         match key_code {
             KeyCode::W => {
@@ -58,7 +63,7 @@ fn on_update(mut keyboard_input: EventReader<KeyboardInput>,
                 })
             }
             default => {
-                MyInputPlugin.log_info(format!(
+                InputPlugin.log_info(format!(
                     "event={} input={:?}",
                     if is_pressed {"keyPressed"} else {"keyReleased"},
                     key_code

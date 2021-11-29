@@ -6,7 +6,7 @@ use plugins::actions_old::ActionsPluginOld;
 use plugins::audio::InternalAudioPlugin;
 use plugins::loading::LoadingPlugin;
 use plugins::menu::MenuPlugin;
-use plugins::my_input::MyInputPlugin;
+use plugins::input::InputPlugin;
 use plugins::player::PlayerPlugin;
 use plugins::movement::MovementPlugin;
 use plugins::actions::ActionsPlugin;
@@ -38,7 +38,7 @@ impl Plugin for GamePlugin {
             // .add_plugin(ActionsPluginOld)
             .add_plugin(InternalAudioPlugin)
             .add_plugin(PlayerPlugin)
-            .add_plugin(MyInputPlugin)
+            .add_plugin(InputPlugin)
             .add_plugin(MovementPlugin)
             .add_plugin(ActionsPlugin);
 

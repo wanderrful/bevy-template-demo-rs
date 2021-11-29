@@ -1,4 +1,4 @@
-pub mod my_input;
+pub mod input;
 pub mod loading;
 pub mod audio;
 pub mod actions;
