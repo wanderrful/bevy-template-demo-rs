@@ -1,12 +1,17 @@
+/// Convert Keyboard inputs into Game Action events, which will in turn affect gameplay.
+use std::collections::HashMap;
+
 use bevy::input::keyboard::KeyboardInput;
 use bevy::prelude::*;
 
 use crate::GameState;
 use crate::utils::Loggable;
-use crate::plugins::actions::{MoveForward, MoveStrafe};
+use crate::plugins::actions::{AxisAction, AxisActionType};
+
 
 /// Represents the Input handler for the Playing GameState.
 pub struct InputPlugin;
+
 
 impl Plugin for InputPlugin {
     fn build(&self, app: &mut AppBuilder) {
@@ -15,60 +20,55 @@ impl Plugin for InputPlugin {
         app.add_system_set(SystemSet::on_enter(GAME_STATE)
                 .with_system(on_enter.system()))
             .add_system_set(SystemSet::on_update(GAME_STATE)
-                .with_system(on_update.system()))
+                .with_system(on_update2.system()))
             .add_system_set(SystemSet::on_exit(GAME_STATE)
                 .with_system(on_exit.system()));
     }
 }
 
+
 fn on_enter() {
     InputPlugin.log_debug("on_enter");
 }
+
 
 fn on_exit() {
     InputPlugin.log_debug("on_exit");
 }
 
-fn on_update(
-    mut keyboard_input: EventReader<KeyboardInput>,
-    mut move_forward: EventWriter<MoveForward>,
-    mut move_strafe: EventWriter<MoveStrafe>
+fn on_update2(
+    keys: Res<Input<KeyCode>>,
+    mut axis_action: EventWriter<AxisAction>,
 ) {
-    keyboard_input.iter().for_each(|key: &KeyboardInput| {
-        let key_code: KeyCode = key.key_code.unwrap();
-        let is_pressed: bool = key.state.is_pressed();
+    let input_bindings = get_input_bindings();
 
-        InputPlugin.log_debug(
-            format!("keyCode={:?} isPressed={}", key_code, is_pressed).as_str());
-
-        match key_code {
-            KeyCode::W => {
-                move_forward.send(MoveForward {
-                    scale: if is_pressed { 1.0 } else { 0.0 }
-                })
-            },
-            KeyCode::S => {
-                move_forward.send(MoveForward {
-                    scale: if is_pressed { -1.0 } else { 0.0 }
-                })
-            },
-            KeyCode::A => {
-                move_strafe.send(MoveStrafe {
-                    scale: if is_pressed { -1.0 } else { 0.0 }
-                })
-            },
-            KeyCode::D => {
-                move_strafe.send(MoveStrafe {
-                    scale: if is_pressed { 1.0 } else { 0.0 }
-                })
-            }
-            default => {
-                InputPlugin.log_info(format!(
-                    "event={} input={:?}",
-                    if is_pressed {"keyPressed"} else {"keyReleased"},
-                    key_code
-                ).as_str());
-            }
+    for it in keys.get_just_pressed() {
+        if input_bindings.contains_key(&it) {
+            InputPlugin.log_info(format!("event=justPressed key={:?}", it).as_str());
         }
-    });
+    }
+
+    for it in keys.get_just_released() {
+        if input_bindings.contains_key(&it) {
+            InputPlugin.log_info(format!("event=justReleased key={:?}", it).as_str());
+        }
+    }
+
+    for it in keys.get_pressed() {
+        if input_bindings.contains_key(&it) {
+            axis_action.send(*input_bindings.get(&it).unwrap());
+        }
+    }
+}
+
+// TODO | Promote this to some kind of Configuration file
+fn get_input_bindings() -> HashMap<KeyCode, AxisAction> {
+    let mut out = HashMap::new();
+
+    out.insert(KeyCode::W, AxisAction { scale: 1.0, kind: AxisActionType::MOVE_FORWARD });
+    out.insert(KeyCode::S, AxisAction { scale: -1.0, kind: AxisActionType::MOVE_FORWARD });
+    out.insert(KeyCode::A, AxisAction { scale: -1.0, kind: AxisActionType::MOVE_STRAFE });
+    out.insert(KeyCode::D, AxisAction { scale: 1.0, kind: AxisActionType::MOVE_STRAFE });
+
+    out
 }

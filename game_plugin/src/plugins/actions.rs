@@ -1,5 +1,4 @@
 /// Process Actions and Send corresponding Events
-
 use bevy::prelude::*;
 
 use crate::GameState;
@@ -9,19 +8,18 @@ pub struct ActionsPlugin;
 
 impl Plugin for ActionsPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.add_event::<MoveForward>()
-            .add_event::<MoveStrafe>();
+        app.add_event::<AxisAction>();
     }
 }
 
-/// GAME ACTIONS
-
-/// Scale should be between -1.0 (move backward) and 1.0 (move forward).
-pub struct MoveForward {
-    pub scale: f32
+#[derive(Debug, Clone, Copy)]
+pub enum AxisActionType {
+    MOVE_FORWARD,
+    MOVE_STRAFE
 }
 
-/// Scale should be between -1.0 (strafe left) and 1.0 (strafe right).
-pub struct MoveStrafe {
-    pub scale: f32
+#[derive(Clone, Copy)]
+pub struct AxisAction {
+    pub scale: f32,
+    pub kind: AxisActionType
 }

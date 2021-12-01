@@ -1,7 +1,7 @@
+use bevy::prelude::*;
+
 use crate::plugins::loading::TextureAssets;
 use crate::GameState;
-use bevy::prelude::*;
-use crate::plugins::actions::{MoveForward, MoveStrafe};
 
 pub struct PlayerPlugin;
 

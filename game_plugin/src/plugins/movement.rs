@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::GameState;
 use crate::utils::Loggable;
-use crate::plugins::actions::{MoveStrafe, MoveForward};
+use crate::plugins::actions::{AxisAction, AxisActionType};
 use crate::plugins::player::Player;
 
 pub struct MovementPlugin;
@@ -32,22 +32,23 @@ fn on_exit() {
 
 fn on_update(
     mut player_query: Query<&mut Transform, With<Player>>,
-    mut move_forward: EventReader<MoveForward>,
-    mut move_strafe: EventReader<MoveStrafe>,
+    mut axis_action: EventReader<AxisAction>,
     time: Res<Time>,
 ) {
     const speed: f32 = 150.0;
     let mut delta = Vec3::ZERO;
     let delta_seconds: f32 = time.delta_seconds();
 
-    for ev in move_forward.iter() {
-        MovementPlugin.log_info("event=MoveForward");
-        delta.y += speed * ev.scale * delta_seconds;
-    }
-
-    for ev in move_strafe.iter() {
-        MovementPlugin.log_info("event=MoveStrafe");
-        delta.x += speed * ev.scale * delta_seconds;
+    for ev in axis_action.iter() {
+        let modifier: f32 = speed * ev.scale * delta_seconds;
+        match ev.kind {
+            AxisActionType::MOVE_FORWARD => {
+                delta.y += modifier;
+            },
+            AxisActionType::MOVE_STRAFE => {
+                delta.x += modifier;
+            }
+        }
     }
 
     for mut transform in player_query.iter_mut() {
