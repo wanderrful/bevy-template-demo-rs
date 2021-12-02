@@ -54,21 +54,25 @@ fn on_update2(
         }
     }
 
-    for it in keys.get_pressed() {
-        if input_bindings.contains_key(&it) {
-            axis_action.send(*input_bindings.get(&it).unwrap());
-        }
-    }
+    // Dispatch events, according to the Input Bindings configuration
+    keys.get_pressed()
+        .for_each(|&it: &KeyCode| input_bindings
+            .iter()
+            .filter(|(&k, &v)| k == it)
+            .map(|(k, v): (&KeyCode, &AxisAction)| v)
+            .for_each(|&v: &AxisAction| axis_action.send(v)));
 }
 
-// TODO | Promote this to some kind of Configuration file
+
+// TODO | Promote this to some kind of Configuration resource
 fn get_input_bindings() -> HashMap<KeyCode, AxisAction> {
-    let mut out = HashMap::new();
-
-    out.insert(KeyCode::W, AxisAction { scale: 1.0, kind: AxisActionType::MOVE_FORWARD });
-    out.insert(KeyCode::S, AxisAction { scale: -1.0, kind: AxisActionType::MOVE_FORWARD });
-    out.insert(KeyCode::A, AxisAction { scale: -1.0, kind: AxisActionType::MOVE_STRAFE });
-    out.insert(KeyCode::D, AxisAction { scale: 1.0, kind: AxisActionType::MOVE_STRAFE });
-
-    out
+    [
+        (KeyCode::W, AxisAction { scale: 1.0, kind: AxisActionType::MOVE_FORWARD }),
+        (KeyCode::S, AxisAction { scale: -1.0, kind: AxisActionType::MOVE_FORWARD }),
+        (KeyCode::A, AxisAction { scale: -1.0, kind: AxisActionType::MOVE_STRAFE }),
+        (KeyCode::D, AxisAction { scale: 1.0, kind: AxisActionType::MOVE_STRAFE })
+    ]
+        .iter()
+        .cloned()
+        .collect()
 }
