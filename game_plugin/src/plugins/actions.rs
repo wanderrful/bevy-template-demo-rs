@@ -8,9 +8,17 @@ pub struct ActionsPlugin;
 
 impl Plugin for ActionsPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.add_event::<AxisAction>();
+        app.add_event::<Action>();
     }
 }
+
+
+#[derive(Debug, Clone, Copy)]
+pub enum Action {
+    Axis(AxisAction),
+    Toggle(ToggleAction)
+}
+
 
 #[derive(Debug, Clone, Copy)]
 pub enum AxisActionType {
@@ -18,8 +26,20 @@ pub enum AxisActionType {
     MOVE_STRAFE
 }
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct AxisAction {
     pub scale: f32,
     pub kind: AxisActionType
+}
+
+
+#[derive(Debug, Clone, Copy)]
+pub enum ToggleActionType {
+    CROUCH
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct ToggleAction {
+    pub enabled: bool,
+    pub kind: ToggleActionType
 }

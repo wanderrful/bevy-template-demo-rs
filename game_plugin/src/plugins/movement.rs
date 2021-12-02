@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::GameState;
 use crate::utils::Loggable;
-use crate::plugins::actions::{AxisAction, AxisActionType};
+use crate::plugins::actions::{Action, AxisAction, AxisActionType, ToggleActionType};
 use crate::plugins::player::Player;
 
 pub struct MovementPlugin;
@@ -32,21 +32,41 @@ fn on_exit() {
 
 fn on_update(
     mut player_query: Query<&mut Transform, With<Player>>,
-    mut axis_action: EventReader<AxisAction>,
+    mut actions: EventReader<Action>,
     time: Res<Time>,
 ) {
     const speed: f32 = 150.0;
     let mut delta = Vec3::ZERO;
     let delta_seconds: f32 = time.delta_seconds();
 
-    for ev in axis_action.iter() {
-        let modifier: f32 = speed * ev.scale * delta_seconds;
-        match ev.kind {
-            AxisActionType::MOVE_FORWARD => {
-                delta.y += modifier;
+    for given_action in actions.iter() {
+        match given_action {
+            Action::Axis(axis_action) => {
+                let modifier: f32 = speed * axis_action.scale * delta_seconds;
+
+                match axis_action.kind {
+                    AxisActionType::MOVE_FORWARD => {
+                        delta.y += modifier;
+                    },
+                    AxisActionType::MOVE_STRAFE => {
+                        delta.x += modifier;
+                    }
+                }
             },
-            AxisActionType::MOVE_STRAFE => {
-                delta.x += modifier;
+
+            Action::Toggle(toggle_action) => {
+                match toggle_action.kind {
+                    ToggleActionType::CROUCH => {
+                        MovementPlugin.log_error(format!("Crouch! enabled={}", toggle_action.enabled).as_str())
+                    },
+                    default => {
+                        MovementPlugin.log_error(format!("Unknown ToggleAction, {:?}", toggle_action.kind).as_str())
+                    }
+                }
+            },
+
+            default => {
+                MovementPlugin.log_error(format!("Unknown Action type, {:?}", given_action).as_str())
             }
         }
     }

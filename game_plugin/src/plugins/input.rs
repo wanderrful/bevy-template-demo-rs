@@ -6,7 +6,7 @@ use bevy::prelude::*;
 
 use crate::GameState;
 use crate::utils::Loggable;
-use crate::plugins::actions::{AxisAction, AxisActionType};
+use crate::plugins::actions::{Action, AxisAction, AxisActionType, ToggleAction, ToggleActionType};
 
 
 /// Represents the Input handler for the Playing GameState.
@@ -17,10 +17,12 @@ impl Plugin for InputPlugin {
     fn build(&self, app: &mut AppBuilder) {
         const GAME_STATE: GameState = GameState::Playing;
 
-        app.add_system_set(SystemSet::on_enter(GAME_STATE)
+        app
+            .insert_resource(InputBindings { bindings: get_input_bindings() })
+            .add_system_set(SystemSet::on_enter(GAME_STATE)
                 .with_system(on_enter.system()))
             .add_system_set(SystemSet::on_update(GAME_STATE)
-                .with_system(on_update2.system()))
+                .with_system(on_update.system()))
             .add_system_set(SystemSet::on_exit(GAME_STATE)
                 .with_system(on_exit.system()));
     }
@@ -36,41 +38,66 @@ fn on_exit() {
     InputPlugin.log_debug("on_exit");
 }
 
-fn on_update2(
+
+/// TODO | Unify these three states into one algorithm!
+fn on_update(
     keys: Res<Input<KeyCode>>,
-    mut axis_action: EventWriter<AxisAction>,
+    input_bindings: Res<InputBindings>,
+    mut action: EventWriter<Action>,
 ) {
-    let input_bindings = get_input_bindings();
-
-    for it in keys.get_just_pressed() {
-        if input_bindings.contains_key(&it) {
-            InputPlugin.log_info(format!("event=justPressed key={:?}", it).as_str());
-        }
-    }
-
-    for it in keys.get_just_released() {
-        if input_bindings.contains_key(&it) {
-            InputPlugin.log_info(format!("event=justReleased key={:?}", it).as_str());
-        }
-    }
-
-    // Dispatch events, according to the Input Bindings configuration
-    keys.get_pressed()
-        .for_each(|&it: &KeyCode| input_bindings
-            .iter()
+    // Publish Toggle Action press events
+    keys.get_just_pressed()
+        .for_each(|&it: &KeyCode| input_bindings.bindings.iter()
             .filter(|(&k, &v)| k == it)
-            .map(|(k, v): (&KeyCode, &AxisAction)| v)
-            .for_each(|&v: &AxisAction| axis_action.send(v)));
+            .map(|(k, v): (&KeyCode, &Action)| v)
+            .filter(|&v| match v { Action::Toggle(_) => true, default => false })
+            .for_each(|&v: &Action| {
+                match v {
+                    Action::Toggle(toggle_action) => {
+                        action.send(Action::Toggle(ToggleAction { enabled: true, kind: toggle_action.kind}))
+                    },
+                    default => {}
+                }
+            }));
+
+    // Publish Toggle Action release events
+    keys.get_just_released()
+        .for_each(|&it: &KeyCode| input_bindings.bindings.iter()
+            .filter(|(&k, &v)| k == it)
+            .map(|(k, v): (&KeyCode, &Action)| v)
+            .filter(|&v| match v { Action::Toggle(_) => true, default => false })
+            .for_each(|&v: &Action| {
+                match v {
+                    Action::Toggle(toggle_action) => {
+                        action.send(Action::Toggle(ToggleAction { enabled: false, kind: toggle_action.kind}))
+                    },
+                    default => {}
+                }
+            }));
+
+    // Publish Axis Action events
+    keys.get_pressed()
+        .for_each(|&it: &KeyCode| input_bindings.bindings.iter()
+            .filter(|(&k, &v)| k == it)
+            .map(|(k, v): (&KeyCode, &Action)| v)
+            .filter(|&v| match v { Action::Axis(_) => true, default => false })
+            .for_each(|&v: &Action| action.send(v)));
 }
 
 
+/// Wrapper struct for the game's Input Bindings.
+struct InputBindings {
+    pub bindings: HashMap<KeyCode, Action>
+}
+
 // TODO | Promote this to some kind of Configuration resource
-fn get_input_bindings() -> HashMap<KeyCode, AxisAction> {
+fn get_input_bindings() -> HashMap<KeyCode, Action> {
     [
-        (KeyCode::W, AxisAction { scale: 1.0, kind: AxisActionType::MOVE_FORWARD }),
-        (KeyCode::S, AxisAction { scale: -1.0, kind: AxisActionType::MOVE_FORWARD }),
-        (KeyCode::A, AxisAction { scale: -1.0, kind: AxisActionType::MOVE_STRAFE }),
-        (KeyCode::D, AxisAction { scale: 1.0, kind: AxisActionType::MOVE_STRAFE })
+        (KeyCode::W, Action::Axis(AxisAction { scale: 1.0, kind: AxisActionType::MOVE_FORWARD })),
+        (KeyCode::S, Action::Axis(AxisAction { scale: -1.0, kind: AxisActionType::MOVE_FORWARD })),
+        (KeyCode::A, Action::Axis(AxisAction { scale: -1.0, kind: AxisActionType::MOVE_STRAFE })),
+        (KeyCode::D, Action::Axis(AxisAction { scale: 1.0, kind: AxisActionType::MOVE_STRAFE })),
+        (KeyCode::C, Action::Toggle(ToggleAction { enabled: false, kind: ToggleActionType::CROUCH }))
     ]
         .iter()
         .cloned()
