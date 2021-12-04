@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use crate::GameState;
 use crate::utils::Loggable;
 use crate::plugins::actions::{Action, AxisAction, AxisActionType, ToggleActionType};
-use crate::plugins::player::Player;
+use crate::plugins::player::CubeActor;
 
 pub struct MovementPlugin;
 
@@ -31,11 +31,11 @@ fn on_exit() {
 }
 
 fn on_update(
-    mut player_query: Query<&mut Transform, With<Player>>,
+    mut player_query: Query<&mut Transform, With<CubeActor>>,
     mut actions: EventReader<Action>,
     time: Res<Time>,
 ) {
-    const speed: f32 = 150.0;
+    const speed: f32 = 5.0;
     let mut delta = Vec3::ZERO;
     let delta_seconds: f32 = time.delta_seconds();
 

@@ -1,37 +1,55 @@
 use bevy::prelude::*;
 
-use crate::plugins::loading::TextureAssets;
 use crate::GameState;
 
 pub struct PlayerPlugin;
 
-pub struct Player;
-
-/// This plugin handles player related stuff like movement
-/// Player logic is only active during the State `GameState::Playing`
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_system_set(
             SystemSet::on_enter(GameState::Playing)
-                .with_system(spawn_player.system())
-                .with_system(spawn_camera.system()),
+                .with_system(spawn_cube_actor.system())
+                .with_system(spawn_camera.system())
+                .with_system(spawn_light.system())
         );
     }
 }
 
-fn spawn_camera(mut commands: Commands) {
-    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
-}
 
-fn spawn_player(
+/// Cube Mesh Actor
+pub struct CubeActor;
+
+fn spawn_cube_actor(
     mut commands: Commands,
-    textures: Res<TextureAssets>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    commands.spawn_bundle(SpriteBundle {
-        material: materials.add(textures.texture_bevy.clone().into()),
-        transform: Transform::from_translation(Vec3::new(0., 0., 1.)),
+    commands.spawn_bundle(PbrBundle {
+        mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+        material: materials.add(Color::rgb(0.8, 0.7, 0.6).into()),
+        transform: Transform::from_xyz(0.0, 0.5, 0.0),
         ..Default::default()
     })
-        .insert(Player);
+        .insert(CubeActor);
+}
+
+
+/// Player's 3D Camera
+pub struct Camera;
+
+fn spawn_camera(mut commands: Commands) {
+    commands
+        .spawn_bundle(PerspectiveCameraBundle {
+            transform: Transform::from_xyz(-2.0, 5.0, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
+            ..Default::default()
+        })
+        .insert(Camera);
+}
+
+fn spawn_light(mut commands: Commands) {
+    commands
+        .spawn_bundle(LightBundle {
+            transform: Transform::from_xyz(4.0, 8.0, 4.0),
+            ..Default::default()
+        });
 }
