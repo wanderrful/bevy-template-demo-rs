@@ -1,4 +1,5 @@
 /// Provide standardized logging structure without any dependencies.
+/// TODO | Get rid of Chrono because I'm only using like 1 or 2 things from it.
 #[allow(unused_variables, dead_code)]
 use chrono::{SecondsFormat, Utc};
 

@@ -12,7 +12,7 @@ impl Plugin for LoadingPlugin {
     fn build(&self, app: &mut AppBuilder) {
         AssetLoader::new(GameState::Loading, GameState::Menu)
             .with_collection::<FontAssets>()
-            .with_collection::<AudioAssets>()
+            // .with_collection::<AudioAssets>()
             .with_collection::<TextureAssets>()
             .build(app);
     }

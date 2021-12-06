@@ -97,7 +97,8 @@ fn get_input_bindings() -> HashMap<KeyCode, Action> {
         (KeyCode::S, Action::Axis(AxisAction { scale: -1.0, kind: AxisActionType::MOVE_FORWARD })),
         (KeyCode::A, Action::Axis(AxisAction { scale: -1.0, kind: AxisActionType::MOVE_STRAFE })),
         (KeyCode::D, Action::Axis(AxisAction { scale: 1.0, kind: AxisActionType::MOVE_STRAFE })),
-        (KeyCode::C, Action::Toggle(ToggleAction { enabled: false, kind: ToggleActionType::CROUCH }))
+        (KeyCode::C, Action::Toggle(ToggleAction { enabled: false, kind: ToggleActionType::CROUCH })),
+        (KeyCode::P, Action::Toggle(ToggleAction { enabled: false, kind: ToggleActionType::SPAWN_CUBE_ACTOR }))
     ]
         .iter()
         .cloned()

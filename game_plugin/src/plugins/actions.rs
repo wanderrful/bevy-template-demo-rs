@@ -35,7 +35,11 @@ pub struct AxisAction {
 
 #[derive(Debug, Clone, Copy)]
 pub enum ToggleActionType {
-    CROUCH
+    /// Use this to Crouch
+    CROUCH,
+
+    /// Use this to Spawn a Cube Actor
+    SPAWN_CUBE_ACTOR
 }
 
 #[derive(Debug, Clone, Copy)]

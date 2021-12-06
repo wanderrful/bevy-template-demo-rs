@@ -46,7 +46,7 @@ fn on_update(
 
                 match axis_action.kind {
                     AxisActionType::MOVE_FORWARD => {
-                        delta.y += modifier;
+                        delta.z += modifier;
                     },
                     AxisActionType::MOVE_STRAFE => {
                         delta.x += modifier;
@@ -64,10 +64,7 @@ fn on_update(
                     }
                 }
             },
-
-            default => {
-                MovementPlugin.log_error(format!("Unknown Action type, {:?}", given_action).as_str())
-            }
+            default => {}
         }
     }
 

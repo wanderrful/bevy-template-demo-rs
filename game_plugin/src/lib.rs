@@ -2,14 +2,14 @@ use bevy::app::AppBuilder;
 // #[cfg(debug_assertions)]
 // use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
-use plugins::actions_old::ActionsPluginOld;
-use plugins::audio::InternalAudioPlugin;
+
 use plugins::loading::LoadingPlugin;
 use plugins::menu::MenuPlugin;
 use plugins::input::InputPlugin;
 use plugins::player::PlayerPlugin;
 use plugins::movement::MovementPlugin;
 use plugins::actions::ActionsPlugin;
+use crate::plugins::physics::MyPhysicsPlugin;
 
 mod plugins;
 mod ui;
@@ -32,15 +32,21 @@ pub struct GamePlugin;
 
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.add_state(GameState::Loading)
+        app
+            // GameState
+            .add_state(GameState::Loading)
+
+            //Game-specific Plugins
             .add_plugin(LoadingPlugin)
             .add_plugin(MenuPlugin)
-            // .add_plugin(ActionsPluginOld)
-            .add_plugin(InternalAudioPlugin)
             .add_plugin(PlayerPlugin)
             .add_plugin(InputPlugin)
             .add_plugin(MovementPlugin)
-            .add_plugin(ActionsPlugin);
+            .add_plugin(ActionsPlugin)
+
+            // My Physics Plugin
+            .add_plugin(MyPhysicsPlugin)
+        ;
 
         // #[cfg(debug_assertions)]
         // {
