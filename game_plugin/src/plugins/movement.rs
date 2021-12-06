@@ -57,11 +57,9 @@ fn on_update(
             Action::Toggle(toggle_action) => {
                 match toggle_action.kind {
                     ToggleActionType::CROUCH => {
-                        MovementPlugin.log_error(format!("Crouch! enabled={}", toggle_action.enabled).as_str())
+                        MovementPlugin.log_error(format!("TODO Crouch! enabled={}", toggle_action.enabled).as_str())
                     },
-                    default => {
-                        MovementPlugin.log_error(format!("Unknown ToggleAction, {:?}", toggle_action.kind).as_str())
-                    }
+                    default => {}
                 }
             },
             default => {}

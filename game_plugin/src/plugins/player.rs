@@ -43,7 +43,7 @@ fn spawn_cube_actor_listener(
         })
         .for_each(|it| {
             commands.spawn_bundle(PbrBundle {
-                mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+                mesh: meshes.add(Mesh::from(shape::Icosphere::default())),
                 material: materials.add(random_color::get_random_color().into()),
                 transform: Transform::from_xyz(0.0, 0.5, 0.0),
                 ..Default::default()
@@ -61,7 +61,7 @@ pub struct Camera;
 fn spawn_camera(mut commands: Commands) {
     commands
         .spawn_bundle(PerspectiveCameraBundle {
-            transform: Transform::from_xyz(-2.0, 5.0, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
+            transform: Transform::from_xyz(-10.0, 25.0, 25.0).looking_at(Vec3::ZERO, Vec3::Y),
             ..Default::default()
         })
         .insert(Camera);
