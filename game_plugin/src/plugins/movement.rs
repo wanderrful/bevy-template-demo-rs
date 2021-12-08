@@ -37,12 +37,11 @@ fn on_update(
 ) {
     const speed: f32 = 5.0;
     let mut delta = Vec3::ZERO;
-    let delta_seconds: f32 = time.delta_seconds();
 
     for given_action in actions.iter() {
         match given_action {
             Action::Axis(axis_action) => {
-                let modifier: f32 = speed * axis_action.scale * delta_seconds;
+                let modifier: f32 = speed * axis_action.scale * time.delta_seconds();
 
                 match axis_action.kind {
                     AxisActionType::MOVE_FORWARD => {
