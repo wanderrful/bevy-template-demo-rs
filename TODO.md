@@ -1,12 +1,19 @@
 # To Do
 
+## Redesign ideas
+[ ] Instead of having a generic Action for all bindings, I should just have one struct for all bindings...
+        because I cannot have mutable access in multiple systems at the same time, so accessing Action
+        events can only be done by one system at a time... which defeats the purpose of this ECS, dependency
+        injection-like system.
+
 ## Input mechanics
 [ ] Promote inputs to configuration file: read on startup
 
 ## FPS Spectator Camera mechanics
 [x] WASD movement
 [ ] Space (jump), C (crouch) for up and down movement
-[ ] Mouse axes to look around
+[x] Mouse axes to look around
+    [ ] Clamp the pitch so that you can't flip upside down
 
 ## RTS Spectator Camera mechanics
 [ ] Mouse cursor on edge of screen to pan the camera
@@ -20,8 +27,8 @@
 [ ] Command Parsing (e.g. spawn a cube via console command)
 
 ## Physics
-[ ] Use meshes exported from Blender for both meshes and collision
-[ ] Fix issue with movement/rotation not interfacing properly with Heron/Rapier
+[ ] Implement collision volumes so that I can react to "overlap" events
+[ ] Figure out the "proper" way to do movement with Heron (rotational force)
 
 ## UI mechanics
 [ ] Main menu

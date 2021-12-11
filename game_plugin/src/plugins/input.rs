@@ -1,7 +1,7 @@
 /// Convert Keyboard inputs into Game Action events, which will in turn affect gameplay.
 use std::collections::HashMap;
 
-use bevy::input::keyboard::KeyboardInput;
+use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
 
 use crate::GameState;
@@ -43,45 +43,53 @@ fn on_exit() {
 fn on_update(
     keys: Res<Input<KeyCode>>,
     input_bindings: Res<InputBindings>,
+    mut mouse_motion: EventReader<MouseMotion>,
     mut action: EventWriter<Action>,
 ) {
     // Publish Toggle Action press events
     keys.get_just_pressed()
         .for_each(|&it: &KeyCode| input_bindings.bindings.iter()
-            .filter(|(&k, &v)| k == it)
-            .map(|(k, v): (&KeyCode, &Action)| v)
-            .filter(|&v| match v { Action::Toggle(_) => true, default => false })
+            .filter(|(&k, &_v)| k == it)
+            .map(|(_k, v): (&KeyCode, &Action)| v)
+            .filter(|&v| match v { Action::Toggle(_) => true, _default => false })
             .for_each(|&v: &Action| {
                 match v {
                     Action::Toggle(toggle_action) => {
                         action.send(Action::Toggle(ToggleAction { enabled: true, kind: toggle_action.kind}))
                     },
-                    default => {}
+                    _default => {}
                 }
             }));
 
     // Publish Toggle Action release events
     keys.get_just_released()
         .for_each(|&it: &KeyCode| input_bindings.bindings.iter()
-            .filter(|(&k, &v)| k == it)
-            .map(|(k, v): (&KeyCode, &Action)| v)
-            .filter(|&v| match v { Action::Toggle(_) => true, default => false })
+            .filter(|(&k, &_v)| k == it)
+            .map(|(_k, v): (&KeyCode, &Action)| v)
+            .filter(|&v| match v { Action::Toggle(_) => true, _default => false })
             .for_each(|&v: &Action| {
                 match v {
                     Action::Toggle(toggle_action) => {
                         action.send(Action::Toggle(ToggleAction { enabled: false, kind: toggle_action.kind}))
                     },
-                    default => {}
+                    _default => {}
                 }
             }));
 
     // Publish Axis Action events
     keys.get_pressed()
         .for_each(|&it: &KeyCode| input_bindings.bindings.iter()
-            .filter(|(&k, &v)| k == it)
-            .map(|(k, v): (&KeyCode, &Action)| v)
-            .filter(|&v| match v { Action::Axis(_) => true, default => false })
+            .filter(|(&k, &_v)| k == it)
+            .map(|(_k, v): (&KeyCode, &Action)| v)
+            .filter(|&v| match v { Action::Axis(_) => true, _default => false })
             .for_each(|&v: &Action| action.send(v)));
+
+    // Publish mouse motion events
+    mouse_motion.iter()
+        .for_each(|it| {
+            action.send(Action::Axis(AxisAction { scale: it.delta.x, kind: AxisActionType::MOUSE_MOTION_X }));
+            action.send(Action::Axis(AxisAction { scale: it.delta.y, kind: AxisActionType::MOUSE_MOTION_Y }));
+        });
 }
 
 

@@ -5,6 +5,7 @@ use crate::GameState;
 use crate::utils::Loggable;
 use crate::utils::random_color;
 use super::actions::{Action, ToggleAction, ToggleActionType};
+use crate::plugins::movement::MobileCamera;
 
 pub struct PlayerPlugin;
 
@@ -15,11 +16,13 @@ impl Plugin for PlayerPlugin {
                 SystemSet::on_enter(GameState::Playing)
                     .with_system(spawn_camera.system())
                     .with_system(spawn_light.system())
-                    .with_system(spawn_floor.system()))
+                    .with_system(spawn_floor.system())
+            )
             .add_system_set(
                 SystemSet::on_update(GameState::Playing)
                     .with_system(spawn_cube_actor_listener.system())
-                    .with_system(bump_cube_actors.system()));
+                    // .with_system(bump_cube_actors.system())
+            );
     }
 }
 
@@ -39,33 +42,35 @@ fn spawn_cube_actor_listener(
                 Action::Toggle(ToggleAction { enabled, kind: ToggleActionType::SPAWN_CUBE_ACTOR }) => {
                     return *enabled
                 },
-                default => { false }
+                _default => { false }
             }
         })
-        .for_each(|it| {
+        .for_each(|_it| {
             commands.spawn_bundle(PbrBundle {
-                mesh: meshes.add(Mesh::from(shape::Icosphere::default())),
+                mesh: meshes.add(Mesh::from(shape::Cube::default())),
                 material: materials.add(random_color::get_random_color().into()),
                 transform: Transform::from_xyz(0.0, 0.5, 0.0),
                 ..Default::default()
             })
-                .insert(CollisionShape::Sphere { radius: 1.0 })
-                .insert(RigidBody::Dynamic)
+                // .insert(CollisionShape::Sphere { radius: 1.0 })
+                // .insert(RigidBody::Dynamic)
                 .insert(CubeActor);
         });
 }
 
 
 /// Player's 3D Camera
-pub struct Camera;
+pub struct SpectatorCamera;
 
 fn spawn_camera(mut commands: Commands) {
     commands
         .spawn_bundle(PerspectiveCameraBundle {
-            transform: Transform::from_xyz(-10.0, 25.0, 25.0).looking_at(Vec3::ZERO, Vec3::Y),
+            transform: Transform::from_xyz(-10.0, 25.0, 25.0)
+                .looking_at(Vec3::ZERO, Vec3::Y),
             ..Default::default()
         })
-        .insert(Camera);
+        .insert(MobileCamera)
+        .insert(SpectatorCamera);
 }
 
 
@@ -95,6 +100,8 @@ fn spawn_floor(mut commands: Commands) {
         });
 }
 
+
+// TODO | Remove this test system
 fn bump_cube_actors(
     mut transforms: Query<&mut Transform, With<CubeActor>>,
     time: Res<Time>
@@ -103,7 +110,7 @@ fn bump_cube_actors(
         PlayerPlugin.log_debug(format!("hello! seconds_since_startup={}",
                     time.seconds_since_startup()).as_str());
         transforms.iter_mut()
-            .for_each(|(mut it)| {
+            .for_each(|mut it| {
                 let q: Vec3 = it.rotation.mul_vec3(-Vec3::Z) * 0.1;
                 it.translation += q;
             });

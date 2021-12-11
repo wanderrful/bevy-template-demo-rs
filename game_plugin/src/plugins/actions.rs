@@ -1,8 +1,6 @@
 /// Process Actions and Send corresponding Events
 use bevy::prelude::*;
 
-use crate::GameState;
-
 /// This Plugin registers Game Events, so that other systems can react to them.
 pub struct ActionsPlugin;
 
@@ -22,8 +20,17 @@ pub enum Action {
 
 #[derive(Debug, Clone, Copy)]
 pub enum AxisActionType {
+    /// Used for forward/backward movement
     MOVE_FORWARD,
-    MOVE_STRAFE
+
+    /// Used for sideways movement
+    MOVE_STRAFE,
+
+    /// Used for left-right mouse movement
+    MOUSE_MOTION_X,
+
+    /// Used for up-down mouse movement
+    MOUSE_MOTION_Y
 }
 
 #[derive(Debug, Clone, Copy)]
