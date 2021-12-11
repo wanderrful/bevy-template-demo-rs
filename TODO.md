@@ -1,19 +1,7 @@
 # To Do
 
-## Redesign ideas
-[ ] Instead of having a generic Action for all bindings, I should just have one struct for all bindings...
-        because I cannot have mutable access in multiple systems at the same time, so accessing Action
-        events can only be done by one system at a time... which defeats the purpose of this ECS, dependency
-        injection-like system.
-
 ## Input mechanics
 [ ] Promote inputs to configuration file: read on startup
-
-## FPS Spectator Camera mechanics
-[x] WASD movement
-[ ] Space (jump), C (crouch) for up and down movement
-[x] Mouse axes to look around
-    [ ] Clamp the pitch so that you can't flip upside down
 
 ## RTS Spectator Camera mechanics
 [ ] Mouse cursor on edge of screen to pan the camera
@@ -37,3 +25,16 @@
 
 # AI
 [ ] Pathfinding: to navigate and move along a path
+
+## FPS Spectator Camera mechanics
+[x] WASD movement
+[x] Space (jump), C (crouch) for up and down movement
+[x] Mouse axes to look around
+    [ ] Clamp the pitch so that you can't flip upside down
+
+## Redesign ideas
+[x] Instead of having a generic Action for all bindings, I should just have one struct for all bindings...
+        because I cannot have mutable access in multiple systems at the same time, so accessing Action
+        events can only be done by one system at a time... which defeats the purpose of this ECS, dependency
+        injection-like system.
+[ ] Refactor the Spectator Camera and its corresponding MovementPlugin all into a single bundle

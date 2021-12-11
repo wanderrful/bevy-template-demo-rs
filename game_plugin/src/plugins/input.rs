@@ -5,11 +5,13 @@ use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
 
 use crate::GameState;
-use crate::utils::Loggable;
-use crate::plugins::actions::{Action, AxisAction, AxisActionType, ToggleAction, ToggleActionType};
+use crate::plugins::actions;
 
 
 /// Represents the Input handler for the Playing GameState.
+///     Input -> &str -> Action -> (Implementations)
+/// The above flow allows us to decouple gameplay inputs from the actions themselves,
+///     so that we can re-bind keys by updating a configuration file.
 pub struct InputPlugin;
 
 
@@ -22,7 +24,8 @@ impl Plugin for InputPlugin {
             .add_system_set(SystemSet::on_enter(GAME_STATE)
                 .with_system(on_enter.system()))
             .add_system_set(SystemSet::on_update(GAME_STATE)
-                .with_system(on_update.system()))
+                .with_system(on_update_keys.system())
+                .with_system(on_update_mouse.system()))
             .add_system_set(SystemSet::on_exit(GAME_STATE)
                 .with_system(on_exit.system()));
     }
@@ -30,83 +33,104 @@ impl Plugin for InputPlugin {
 
 
 fn on_enter() {
-    InputPlugin.log_debug("on_enter");
+    debug!("on_enter");
 }
 
 
 fn on_exit() {
-    InputPlugin.log_debug("on_exit");
+    debug!("on_exit");
 }
 
 
-/// TODO | Unify these three states into one algorithm!
-fn on_update(
+// TODO | Maybe I could use a `dyn Toggleable` trait to generify this?
+// TODO | How can I promote the relationship between `&'static str` and `actions::*`?
+//     It's a design constraint: if I generify the Actions, then I can't use dependency injection.
+/// Map key inputs to game Actions!
+fn on_update_keys(
     keys: Res<Input<KeyCode>>,
     input_bindings: Res<InputBindings>,
-    mut mouse_motion: EventReader<MouseMotion>,
-    mut action: EventWriter<Action>,
+    mut move_forward: EventWriter<actions::MoveForward>,
+    mut move_strafe: EventWriter<actions::StrafeRight>,
+    mut crouch: EventWriter<actions::Crouch>,
+    mut jump: EventWriter<actions::Jump>,
+    mut spawn_cube_actor: EventWriter<actions::SpawnCubeActor>,
+    mut spawn_spectator_camera: EventWriter<actions::SpawnSpectatorCamera>
 ) {
-    // Publish Toggle Action press events
-    keys.get_just_pressed()
-        .for_each(|&it: &KeyCode| input_bindings.bindings.iter()
+    keys.get_just_pressed().for_each(|&it| {
+        input_bindings.bindings.iter()
             .filter(|(&k, &_v)| k == it)
-            .map(|(_k, v): (&KeyCode, &Action)| v)
-            .filter(|&v| match v { Action::Toggle(_) => true, _default => false })
-            .for_each(|&v: &Action| {
-                match v {
-                    Action::Toggle(toggle_action) => {
-                        action.send(Action::Toggle(ToggleAction { enabled: true, kind: toggle_action.kind}))
-                    },
-                    _default => {}
+            .map(|(_k, v)| v)
+            .for_each(|&action| {
+                match action {
+                    "SpawnCubeActor" => spawn_cube_actor.send(actions::SpawnCubeActor),
+                    "SpawnSpectatorCamera" => spawn_spectator_camera.send(actions::SpawnSpectatorCamera),
+                    default => {}
                 }
-            }));
+            });
+    });
 
-    // Publish Toggle Action release events
-    keys.get_just_released()
-        .for_each(|&it: &KeyCode| input_bindings.bindings.iter()
+    keys.get_just_released().for_each(|&it| {
+        input_bindings.bindings.iter()
             .filter(|(&k, &_v)| k == it)
-            .map(|(_k, v): (&KeyCode, &Action)| v)
-            .filter(|&v| match v { Action::Toggle(_) => true, _default => false })
-            .for_each(|&v: &Action| {
-                match v {
-                    Action::Toggle(toggle_action) => {
-                        action.send(Action::Toggle(ToggleAction { enabled: false, kind: toggle_action.kind}))
-                    },
-                    _default => {}
+            .map(|(_k, v)| v)
+            .for_each(|&action| {
+                match action {
+                    default => {}
                 }
-            }));
+            });
+    });
 
-    // Publish Axis Action events
-    keys.get_pressed()
-        .for_each(|&it: &KeyCode| input_bindings.bindings.iter()
+    keys.get_pressed().for_each(|&it| {
+        input_bindings.bindings.iter()
             .filter(|(&k, &_v)| k == it)
-            .map(|(_k, v): (&KeyCode, &Action)| v)
-            .filter(|&v| match v { Action::Axis(_) => true, _default => false })
-            .for_each(|&v: &Action| action.send(v)));
+            .map(|(_k, v)| v)
+            .for_each(|&action| {
+                match action {
+                    "MoveForward" => move_forward.send(actions::MoveForward(1.0)),
+                    "MoveBackward" => move_forward.send(actions::MoveForward(-1.0)),
+                    "StrafeLeft" => move_strafe.send(actions::StrafeRight(-1.0)),
+                    "StrafeRight" => move_strafe.send(actions::StrafeRight(1.0)),
+                    "Crouch" => crouch.send(actions::Crouch(true)),
+                    "Jump" => jump.send(actions::Jump(true)),
+                    default => {}
+                }
+            });
+    });
+}
 
-    // Publish mouse motion events
-    mouse_motion.iter()
-        .for_each(|it| {
-            action.send(Action::Axis(AxisAction { scale: it.delta.x, kind: AxisActionType::MOUSE_MOTION_X }));
-            action.send(Action::Axis(AxisAction { scale: it.delta.y, kind: AxisActionType::MOUSE_MOTION_Y }));
-        });
+
+/// Map mouse movement to game Actions!
+fn on_update_mouse(
+    input_bindings: Res<InputBindings>,
+    mut mouse_motion: EventReader<MouseMotion>,
+    mut look_up: EventWriter<actions::LookUp>,
+    mut look_right: EventWriter<actions::LookRight>
+) {
+    mouse_motion.iter().for_each(|it: &MouseMotion| {
+        look_up.send(actions::LookUp(it.delta.y));
+        look_right.send(actions::LookRight(it.delta.x));
+    });
 }
 
 
 /// Wrapper struct for the game's Input Bindings.
 struct InputBindings {
-    pub bindings: HashMap<KeyCode, Action>
+    pub bindings: HashMap<KeyCode, &'static str>
 }
 
 // TODO | Promote this to some kind of Configuration resource
-fn get_input_bindings() -> HashMap<KeyCode, Action> {
+fn get_input_bindings() -> HashMap<KeyCode, &'static str> {
     [
-        (KeyCode::W, Action::Axis(AxisAction { scale: 1.0, kind: AxisActionType::MOVE_FORWARD })),
-        (KeyCode::S, Action::Axis(AxisAction { scale: -1.0, kind: AxisActionType::MOVE_FORWARD })),
-        (KeyCode::A, Action::Axis(AxisAction { scale: -1.0, kind: AxisActionType::MOVE_STRAFE })),
-        (KeyCode::D, Action::Axis(AxisAction { scale: 1.0, kind: AxisActionType::MOVE_STRAFE })),
-        (KeyCode::C, Action::Toggle(ToggleAction { enabled: false, kind: ToggleActionType::CROUCH })),
-        (KeyCode::P, Action::Toggle(ToggleAction { enabled: false, kind: ToggleActionType::SPAWN_CUBE_ACTOR }))
+        (KeyCode::W, "MoveForward"),
+        (KeyCode::S, "MoveBackward"),
+        (KeyCode::A, "StrafeLeft"),
+        (KeyCode::D, "StrafeRight"),
+
+        (KeyCode::C, "Crouch"),
+        (KeyCode::Space, "Jump"),
+
+        (KeyCode::P, "SpawnCubeActor"),
+        (KeyCode::F1, "SpawnSpectatorCamera")
     ]
         .iter()
         .cloned()

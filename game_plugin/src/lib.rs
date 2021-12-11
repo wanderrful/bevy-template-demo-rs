@@ -1,19 +1,19 @@
-use bevy::app::AppBuilder;
-// #[cfg(debug_assertions)]
-// use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
-use bevy::prelude::*;
-
-use plugins::loading::LoadingPlugin;
-use plugins::menu::MenuPlugin;
-use plugins::input::InputPlugin;
-use plugins::player::PlayerPlugin;
-use plugins::movement::MovementPlugin;
-use plugins::actions::ActionsPlugin;
-use crate::plugins::physics::MyPhysicsPlugin;
-
 mod plugins;
 mod ui;
 mod utils;
+
+use bevy::prelude::*;
+// #[cfg(debug_assertions)]
+// use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
+
+use crate::plugins::loading::LoadingPlugin;
+use crate::plugins::menu::MenuPlugin;
+use crate::plugins::input::InputPlugin;
+use crate::plugins::player::PlayerPlugin;
+use crate::plugins::actions::ActionsPlugin;
+use crate::plugins::physics::MyPhysicsPlugin;
+use crate::plugins::spectator::spectator::SpectatorCameraPlugin;
+
 
 // This example game uses States to separate logic
 // See https://bevy-cheatbook.github.io/programming/states.html
@@ -41,8 +41,8 @@ impl Plugin for GamePlugin {
             .add_plugin(MenuPlugin)
             .add_plugin(PlayerPlugin)
             .add_plugin(InputPlugin)
-            .add_plugin(MovementPlugin)
             .add_plugin(ActionsPlugin)
+            .add_plugins(SpectatorCameraPlugin)
 
             // My Physics Plugin
             .add_plugin(MyPhysicsPlugin)

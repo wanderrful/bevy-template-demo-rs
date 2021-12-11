@@ -2,11 +2,19 @@ use bevy::prelude::*;
 use heron::prelude::*;
 
 use crate::GameState;
-use crate::utils::Loggable;
 use crate::utils::random_color;
-use super::actions::{Action, ToggleAction, ToggleActionType};
-use crate::plugins::movement::MobileCamera;
+use super::actions;
 
+
+
+/// An Entity with this Possessed Component means that the Player's inputs are being handled here.
+///     TODO | How do I combine this with reading inputs for UI purposes?
+pub struct Possessed;
+
+
+// TODO | Refactor this PlayerPlugin to be a generic "spawn something" plugin... where we optionally
+//  Possess the thing we're spawning?
+/// PlayerPlugin allows us to spawn Characters such that the Player can possess them.
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
@@ -14,7 +22,6 @@ impl Plugin for PlayerPlugin {
         app
             .add_system_set(
                 SystemSet::on_enter(GameState::Playing)
-                    .with_system(spawn_camera.system())
                     .with_system(spawn_light.system())
                     .with_system(spawn_floor.system())
             )
@@ -34,17 +41,9 @@ fn spawn_cube_actor_listener(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    mut spawn_cube_actor_event: EventReader<Action>
+    mut spawn_cube_actor_event: EventReader<actions::SpawnCubeActor>
 ) {
     spawn_cube_actor_event.iter()
-        .filter(|&it| {
-            match it {
-                Action::Toggle(ToggleAction { enabled, kind: ToggleActionType::SPAWN_CUBE_ACTOR }) => {
-                    return *enabled
-                },
-                _default => { false }
-            }
-        })
         .for_each(|_it| {
             commands.spawn_bundle(PbrBundle {
                 mesh: meshes.add(Mesh::from(shape::Cube::default())),
@@ -52,27 +51,11 @@ fn spawn_cube_actor_listener(
                 transform: Transform::from_xyz(0.0, 0.5, 0.0),
                 ..Default::default()
             })
-                // .insert(CollisionShape::Sphere { radius: 1.0 })
-                // .insert(RigidBody::Dynamic)
+                .insert(CollisionShape::Sphere { radius: 1.0 })
+                .insert(RigidBody::Dynamic)
                 .insert(CubeActor);
         });
 }
-
-
-/// Player's 3D Camera
-pub struct SpectatorCamera;
-
-fn spawn_camera(mut commands: Commands) {
-    commands
-        .spawn_bundle(PerspectiveCameraBundle {
-            transform: Transform::from_xyz(-10.0, 25.0, 25.0)
-                .looking_at(Vec3::ZERO, Vec3::Y),
-            ..Default::default()
-        })
-        .insert(MobileCamera)
-        .insert(SpectatorCamera);
-}
-
 
 /// To query lights, use `bevy_pbr::Light`
 fn spawn_light(mut commands: Commands) {
@@ -107,8 +90,6 @@ fn bump_cube_actors(
     time: Res<Time>
 ) {
     if time.seconds_since_startup() as i64 % 5 == 0 {
-        PlayerPlugin.log_debug(format!("hello! seconds_since_startup={}",
-                    time.seconds_since_startup()).as_str());
         transforms.iter_mut()
             .for_each(|mut it| {
                 let q: Vec3 = it.rotation.mul_vec3(-Vec3::Z) * 0.1;

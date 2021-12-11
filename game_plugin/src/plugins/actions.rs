@@ -1,56 +1,44 @@
-/// Process Actions and Send corresponding Events
-use bevy::prelude::*;
+use bevy::app::{AppBuilder, Plugin};
+
 
 /// This Plugin registers Game Events, so that other systems can react to them.
 pub struct ActionsPlugin;
 
 impl Plugin for ActionsPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.add_event::<Action>();
+        app
+            .add_event::<LookUp>()
+            .add_event::<LookRight>()
+            .add_event::<MoveForward>()
+            .add_event::<StrafeRight>()
+            .add_event::<Crouch>()
+            .add_event::<Jump>()
+            .add_event::<SpawnCubeActor>()
+            .add_event::<SpawnSpectatorCamera>()
+        ;
     }
 }
 
 
-#[derive(Debug, Clone, Copy)]
-pub enum Action {
-    Axis(AxisAction),
-    Toggle(ToggleAction)
-}
+// Types of actions
+type AxisScale = f32;
+type IsEnabled = bool;
 
 
-#[derive(Debug, Clone, Copy)]
-pub enum AxisActionType {
-    /// Used for forward/backward movement
-    MOVE_FORWARD,
-
-    /// Used for sideways movement
-    MOVE_STRAFE,
-
-    /// Used for left-right mouse movement
-    MOUSE_MOTION_X,
-
-    /// Used for up-down mouse movement
-    MOUSE_MOTION_Y
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct AxisAction {
-    pub scale: f32,
-    pub kind: AxisActionType
-}
+// Mouse motion actions
+pub struct LookUp(pub AxisScale);
+pub struct LookRight(pub AxisScale);
 
 
-#[derive(Debug, Clone, Copy)]
-pub enum ToggleActionType {
-    /// Use this to Crouch
-    CROUCH,
+// Movement actions
+pub struct MoveForward(pub AxisScale);
+pub struct StrafeRight(pub AxisScale);
 
-    /// Use this to Spawn a Cube Actor
-    SPAWN_CUBE_ACTOR
-}
 
-#[derive(Debug, Clone, Copy)]
-pub struct ToggleAction {
-    pub enabled: bool,
-    pub kind: ToggleActionType
-}
+// Stance actions
+pub struct Crouch(pub IsEnabled);
+pub struct Jump(pub IsEnabled);
+
+// Debug actions
+pub struct SpawnCubeActor;
+pub struct SpawnSpectatorCamera;
