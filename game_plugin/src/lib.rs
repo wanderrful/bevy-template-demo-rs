@@ -12,7 +12,7 @@ use crate::plugins::input::InputPlugin;
 use crate::plugins::player::PlayerPlugin;
 use crate::plugins::actions::ActionsPlugin;
 use crate::plugins::physics::MyPhysicsPlugin;
-use crate::plugins::spectator::spectator::SpectatorCameraPlugin;
+use crate::plugins::spectator::SpectatorCameraPlugin;
 
 
 // This example game uses States to separate logic

@@ -78,7 +78,7 @@ fn on_spawn_spectator_camera_listener(
                     .insert(Possessed)
                     .insert(SpectatorCamera);
             } else {
-                info!("Spawning Spectator Camera...");
+                info!("Possessed Spectator Camera already exists! Ignoring spawn attempt...");
             }
         });
 }
