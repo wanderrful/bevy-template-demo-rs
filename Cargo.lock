@@ -430,11 +430,11 @@ version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b91a3a768c59a5965f491cda74fd75a72b4cd7c51c85b5a731dd4d8688582dc5"
 dependencies = [
-    "bevy_app",
-    "bevy_ecs",
-    "bevy_math",
-    "bevy_utils",
-    "serde",
+ "bevy_app",
+ "bevy_ecs",
+ "bevy_math",
+ "bevy_utils",
+ "serde",
 ]
 
 [[package]]
@@ -1539,14 +1539,14 @@ dependencies = [
 name = "game_plugin"
 version = "0.1.0"
 dependencies = [
-    "bevy",
-    "bevy_asset_loader",
-    "bevy_kira_audio",
-    "chrono",
-    "heron",
-    "rand",
-    "serde",
-    "serde_yaml",
+ "bevy",
+ "bevy_asset_loader",
+ "bevy_kira_audio",
+ "chrono",
+ "heron",
+ "rand",
+ "serde",
+ "serde_yaml",
 ]
 
 [[package]]
@@ -2186,7 +2186,7 @@ version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0382880606dff6d15c9476c416d18690b72742aa7b605bb6dd6ec9030fbf07eb"
 dependencies = [
-    "scopeguard",
+ "scopeguard",
 ]
 
 [[package]]
@@ -3170,9 +3170,9 @@ version = "1.0.64"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "799e97dc9fdae36a5c8b8f2cae9ce2ee9fdce2058c57a93e6099d919fd982f79"
 dependencies = [
-    "itoa",
-    "ryu",
-    "serde",
+ "itoa",
+ "ryu",
+ "serde",
 ]
 
 [[package]]
@@ -3181,10 +3181,10 @@ version = "0.8.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a4a521f2940385c165a24ee286aa8599633d162077a54bdcae2a6fd5a7bfa7a0"
 dependencies = [
-    "indexmap",
-    "ryu",
-    "serde",
-    "yaml-rust",
+ "indexmap",
+ "ryu",
+ "serde",
+ "yaml-rust",
 ]
 
 [[package]]
@@ -4102,5 +4102,5 @@ version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "56c1936c4cc7a1c9ab21a1ebb602eb942ba868cbd44a99cb7cdc5892335e1c85"
 dependencies = [
-    "linked-hash-map",
+ "linked-hash-map",
 ]

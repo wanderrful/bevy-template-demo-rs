@@ -42,10 +42,9 @@ fn on_exit() {
 }
 
 
-// TODO | Maybe I could use a `dyn Toggleable` trait to generify this?
-// TODO | How can I promote the relationship between `&'static str` and `actions::*`?
-//     It's a design constraint: if I generify the Actions, then I can't use dependency injection.
 /// Map key inputs to game Actions!
+/// bevy::KeyCode -> std::String -> EventWriter<actions::*>
+// TODO | _Should_ I replace std::String with an enum? Or can I somehow consolidate this?
 fn on_update_keys(
     keys: Res<Input<KeyCode>>,
     input_bindings: Res<InputBindings>,
@@ -123,11 +122,11 @@ struct InputBinding {
 }
 
 fn get_input_bindings() -> InputBindings {
-    const INPUT_FILE_LOCATION: &str = "assets/inputs.yml";
-    let error_input_file_formatting: String =
-        format!("Input file at '{}' is not formatted properly!", INPUT_FILE_LOCATION);
+    const INPUT_FILE_LOCATION: &str = "assets/inputs.yaml";
     let error_input_file_not_found: String =
         format!("Input file not found at '{}'!", INPUT_FILE_LOCATION);
+    let error_input_file_formatting: String =
+        format!("Input file at '{}' is not formatted properly!", INPUT_FILE_LOCATION);
 
     let input_bindings: Vec<InputBinding> = serde_yaml::from_reader(
         std::io::BufReader::new(std::fs::File::open(INPUT_FILE_LOCATION)
