@@ -158,10 +158,10 @@ fn on_update_look_up(
     actions.iter().for_each(|action: &LookUp| {
         let delta: f32 = (action.0 * time.delta_seconds() * SENSITIVITY).to_radians();
         player_query.iter_mut().for_each(|mut transform| {
-            let new_rotation = Quat::from_axis_angle(
+            let new_rotation = transform.rotation * Quat::from_axis_angle(
                 -transform.local_x(),
                 delta
-            ) * transform.rotation;
+            );
 
             transform.rotation = new_rotation.normalize();
         });

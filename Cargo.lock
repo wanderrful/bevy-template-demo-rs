@@ -430,10 +430,11 @@ version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b91a3a768c59a5965f491cda74fd75a72b4cd7c51c85b5a731dd4d8688582dc5"
 dependencies = [
- "bevy_app",
- "bevy_ecs",
- "bevy_math",
- "bevy_utils",
+    "bevy_app",
+    "bevy_ecs",
+    "bevy_math",
+    "bevy_utils",
+    "serde",
 ]
 
 [[package]]
@@ -1538,12 +1539,14 @@ dependencies = [
 name = "game_plugin"
 version = "0.1.0"
 dependencies = [
- "bevy",
- "bevy_asset_loader",
- "bevy_kira_audio",
- "chrono",
- "heron",
- "rand",
+    "bevy",
+    "bevy_asset_loader",
+    "bevy_kira_audio",
+    "chrono",
+    "heron",
+    "rand",
+    "serde",
+    "serde_yaml",
 ]
 
 [[package]]
@@ -2172,12 +2175,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c7d73b3f436185384286bd8098d17ec07c9a7d2388a6599f824d8502b529702a"
 
 [[package]]
+name = "linked-hash-map"
+version = "0.5.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7fb9b38af92608140b86b693604b9ffcc5824240a484d1ecd4795bacb2fe88f3"
+
+[[package]]
 name = "lock_api"
 version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0382880606dff6d15c9476c416d18690b72742aa7b605bb6dd6ec9030fbf07eb"
 dependencies = [
- "scopeguard",
+    "scopeguard",
 ]
 
 [[package]]
@@ -3161,9 +3170,21 @@ version = "1.0.64"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "799e97dc9fdae36a5c8b8f2cae9ce2ee9fdce2058c57a93e6099d919fd982f79"
 dependencies = [
- "itoa",
- "ryu",
- "serde",
+    "itoa",
+    "ryu",
+    "serde",
+]
+
+[[package]]
+name = "serde_yaml"
+version = "0.8.23"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a4a521f2940385c165a24ee286aa8599633d162077a54bdcae2a6fd5a7bfa7a0"
+dependencies = [
+    "indexmap",
+    "ryu",
+    "serde",
+    "yaml-rust",
 ]
 
 [[package]]
@@ -4074,3 +4095,12 @@ name = "xml-rs"
 version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b07db065a5cf61a7e4ba64f29e67db906fb1787316516c4e6e5ff0fea1efcd8a"
+
+[[package]]
+name = "yaml-rust"
+version = "0.4.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "56c1936c4cc7a1c9ab21a1ebb602eb942ba868cbd44a99cb7cdc5892335e1c85"
+dependencies = [
+    "linked-hash-map",
+]

@@ -1,0 +1,21 @@
+# Axis Actions
+- binding: MoveForward
+  key: E
+- binding: MoveBackward
+  key: D
+- binding: StrafeLeft
+  key: S
+- binding: StrafeRight
+  key: F
+
+# Toggle Actions
+- binding: Crouch
+  key: C
+- binding: Jump
+  key: Space
+
+# Debug Actions
+- binding: SpawnCubeActor
+  key: P
+- binding: SpawnSpectatorCamera
+  key: F1
