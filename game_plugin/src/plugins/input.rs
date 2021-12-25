@@ -52,6 +52,7 @@ fn on_update_keys(
     mut move_strafe: EventWriter<actions::StrafeRight>,
     mut crouch: EventWriter<actions::Crouch>,
     mut jump: EventWriter<actions::Jump>,
+    mut toggle_console: EventWriter<actions::ToggleConsole>,
     mut spawn_cube_actor: EventWriter<actions::SpawnCubeActor>,
     mut spawn_spectator_camera: EventWriter<actions::SpawnSpectatorCamera>
 ) {
@@ -63,6 +64,7 @@ fn on_update_keys(
                 match action.as_str() {
                     "SpawnCubeActor" => spawn_cube_actor.send(actions::SpawnCubeActor),
                     "SpawnSpectatorCamera" => spawn_spectator_camera.send(actions::SpawnSpectatorCamera),
+                    "ToggleConsole" => toggle_console.send(actions::ToggleConsole),
                     default => {}
                 }
             });
@@ -113,7 +115,7 @@ fn on_update_mouse(
 
 
 /// Wrapper struct for the game's Input Bindings.
-type InputBindings = HashMap<KeyCode, String>;
+pub type InputBindings = HashMap<KeyCode, String>;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 struct InputBinding {

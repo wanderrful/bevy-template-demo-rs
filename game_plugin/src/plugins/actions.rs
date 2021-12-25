@@ -13,6 +13,8 @@ impl Plugin for ActionsPlugin {
             .add_event::<StrafeRight>()
             .add_event::<Crouch>()
             .add_event::<Jump>()
+            .add_event::<ToggleConsole>()
+            .add_event::<ProcessConsoleCommand>()
             .add_event::<SpawnCubeActor>()
             .add_event::<SpawnSpectatorCamera>()
         ;
@@ -42,3 +44,6 @@ pub struct Jump(pub IsEnabled);
 // Debug actions
 pub struct SpawnCubeActor;
 pub struct SpawnSpectatorCamera;
+
+pub struct ToggleConsole;
+pub struct ProcessConsoleCommand(pub String);

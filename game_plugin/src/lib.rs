@@ -13,6 +13,7 @@ use crate::plugins::player::PlayerPlugin;
 use crate::plugins::actions::ActionsPlugin;
 use crate::plugins::physics::MyPhysicsPlugin;
 use crate::plugins::spectator::SpectatorCameraPlugin;
+use crate::plugins::console::ConsolePlugin;
 
 
 #[derive(Clone, Eq, PartialEq, Debug, Hash)]
@@ -41,6 +42,7 @@ impl Plugin for GamePlugin {
             .add_plugin(InputPlugin)
             .add_plugin(ActionsPlugin)
             .add_plugins(SpectatorCameraPlugin)
+            .add_plugin(ConsolePlugin)
 
             // My Physics Plugin
             .add_plugin(MyPhysicsPlugin)
