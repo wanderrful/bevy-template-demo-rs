@@ -7,6 +7,7 @@ use crate::plugins::actions::{
     MoveForward, StrafeRight, LookUp, LookRight, Crouch, Jump, SpawnSpectatorCamera
 };
 use crate::plugins::player::Possessed;
+use crate::plugins::console::IsFocusedOnUI;
 
 
 /// External-facing Plugin. Use this to add to your project!
@@ -28,7 +29,8 @@ impl Plugin for SpectatorPlugin {
         const GAME_STATE: GameState = GameState::Playing;
 
         app.add_system_set(SystemSet::on_enter(GAME_STATE)
-                .with_system(on_enter.system()))
+                .with_system(on_enter.system())
+                .with_system(create_spectator_camera.system()))
 
             .add_system_set(SystemSet::on_update(GAME_STATE)
                 // Spawn when event broadcast is received
@@ -84,6 +86,14 @@ fn on_spawn_spectator_camera_listener(
 }
 
 
+/// Intended as a Startup system, to ensure one is created.
+fn create_spectator_camera(
+    mut spawn_spectator_camera: EventWriter<SpawnSpectatorCamera>,
+) {
+    spawn_spectator_camera.send(SpawnSpectatorCamera);
+}
+
+
 
 // TODO | Promote these to configurations of some kind!
 //  Maybe it can be a proprety of Possessed? Or Character?
@@ -91,7 +101,7 @@ const SPEED: f32 = 15.0;
 const SENSITIVITY: f32 = 10.0;
 
 fn on_update_move_forward(
-    mut player_query: Query<&mut Transform, With<Possessed>>,
+    mut player_query: Query<&mut Transform, (With<Possessed>, Without<IsFocusedOnUI>)>,
     mut actions: EventReader<MoveForward>,
     time: Res<Time>
 ) {
@@ -105,7 +115,7 @@ fn on_update_move_forward(
 }
 
 fn on_update_move_strafe(
-    mut player_query: Query<&mut Transform, With<Possessed>>,
+    mut player_query: Query<&mut Transform, (With<Possessed>, Without<IsFocusedOnUI>)>,
     mut actions: EventReader<StrafeRight>,
     time: Res<Time>
 ) {
@@ -119,7 +129,7 @@ fn on_update_move_strafe(
 }
 
 fn on_update_crouch(
-    mut player_query: Query<&mut Transform, With<Possessed>>,
+    mut player_query: Query<&mut Transform, (With<Possessed>, Without<IsFocusedOnUI>)>,
     mut actions: EventReader<Crouch>,
     time: Res<Time>
 ) {
@@ -135,7 +145,7 @@ fn on_update_crouch(
 }
 
 fn on_update_jump(
-    mut player_query: Query<&mut Transform, With<Possessed>>,
+    mut player_query: Query<&mut Transform, (With<Possessed>, Without<IsFocusedOnUI>)>,
     mut actions: EventReader<Jump>,
     time: Res<Time>
 ) {
@@ -151,7 +161,7 @@ fn on_update_jump(
 }
 
 fn on_update_look_up(
-    mut player_query: Query<&mut Transform, With<Possessed>>,
+    mut player_query: Query<&mut Transform, (With<Possessed>, Without<IsFocusedOnUI>)>,
     mut actions: EventReader<LookUp>,
     time: Res<Time>
 ) {
@@ -169,7 +179,7 @@ fn on_update_look_up(
 }
 
 fn on_update_look_right(
-    mut player_query: Query<&mut Transform, With<Possessed>>,
+    mut player_query: Query<&mut Transform, (With<Possessed>, Without<IsFocusedOnUI>)>,
     mut actions: EventReader<LookRight>,
     time: Res<Time>
 ) {

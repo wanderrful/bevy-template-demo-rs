@@ -14,6 +14,7 @@ use crate::plugins::actions::ActionsPlugin;
 use crate::plugins::physics::MyPhysicsPlugin;
 use crate::plugins::spectator::SpectatorCameraPlugin;
 use crate::plugins::console::ConsolePlugin;
+use crate::plugins::experimental::MyExperimentalPlugin;
 
 
 #[derive(Clone, Eq, PartialEq, Debug, Hash)]
@@ -46,6 +47,9 @@ impl Plugin for GamePlugin {
 
             // My Physics Plugin
             .add_plugin(MyPhysicsPlugin)
+
+            // My experimental plugin
+            .add_plugin(MyExperimentalPlugin)
         ;
 
         // #[cfg(debug_assertions)]

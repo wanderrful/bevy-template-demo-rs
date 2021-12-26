@@ -1,11 +1,13 @@
 /// Convert Keyboard inputs into Game Action events, which will in turn affect gameplay.
 use std::collections::HashMap;
 
-use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
+use bevy::input::mouse::MouseMotion;
 
 use crate::GameState;
 use crate::plugins::actions;
+use crate::plugins::console::IsFocusedOnUI;
+use crate::plugins::player::Possessed;
 
 
 /// Represents the Input handler for the Playing GameState.
@@ -24,8 +26,9 @@ impl Plugin for InputPlugin {
             .add_system_set(SystemSet::on_enter(GAME_STATE)
                 .with_system(on_enter.system()))
             .add_system_set(SystemSet::on_update(GAME_STATE)
-                .with_system(on_update_keys.system())
-                .with_system(on_update_mouse.system()))
+                .with_system(handle_game_input.system())
+                .with_system(handle_debug_input.system())
+                .with_system(on_update_mouse_movement.system()))
             .add_system_set(SystemSet::on_exit(GAME_STATE)
                 .with_system(on_exit.system()));
     }
@@ -42,19 +45,66 @@ fn on_exit() {
 }
 
 
-/// Map key inputs to game Actions!
-/// bevy::KeyCode -> std::String -> EventWriter<actions::*>
+/// Game Input Handler
 // TODO | _Should_ I replace std::String with an enum? Or can I somehow consolidate this?
-fn on_update_keys(
+fn handle_game_input(
+    player: Query<Entity, (With<Possessed>, Without<IsFocusedOnUI>)>,
     keys: Res<Input<KeyCode>>,
     input_bindings: Res<InputBindings>,
     mut move_forward: EventWriter<actions::MoveForward>,
     mut move_strafe: EventWriter<actions::StrafeRight>,
     mut crouch: EventWriter<actions::Crouch>,
     mut jump: EventWriter<actions::Jump>,
+) {
+    player.for_each(|_| {
+        keys.get_just_pressed().for_each(|&it| {
+            input_bindings.iter()
+                .filter(|(&k, _v)| k == it)
+                .map(|(_k, v)| v)
+                .for_each(|action| {
+                    match action.as_str() {
+                        default => {}
+                    }
+                });
+        });
+
+        keys.get_just_released().for_each(|&it| {
+            input_bindings.iter()
+                .filter(|(&k, _v)| k == it)
+                .map(|(_k, v)| v)
+                .for_each(|action| {
+                    match action.as_str() {
+                        default => {}
+                    }
+                });
+        });
+
+        keys.get_pressed().for_each(|&it| {
+            input_bindings.iter()
+                .filter(|(&k, _v)| k == it)
+                .map(|(_k, v)| v)
+                .for_each(|action| {
+                    match action.as_str() {
+                        "MoveForward" => move_forward.send(actions::MoveForward(1.0)),
+                        "MoveBackward" => move_forward.send(actions::MoveForward(-1.0)),
+                        "StrafeLeft" => move_strafe.send(actions::StrafeRight(-1.0)),
+                        "StrafeRight" => move_strafe.send(actions::StrafeRight(1.0)),
+                        "Crouch" => crouch.send(actions::Crouch(true)),
+                        "Jump" => jump.send(actions::Jump(true)),
+                        default => {}
+                    }
+                });
+        });
+    });
+}
+
+/// Handle key inputs that are independent of InputMode
+fn handle_debug_input(
+    keys: Res<Input<KeyCode>>,
+    input_bindings: Res<InputBindings>,
     mut toggle_console: EventWriter<actions::ToggleConsole>,
     mut spawn_cube_actor: EventWriter<actions::SpawnCubeActor>,
-    mut spawn_spectator_camera: EventWriter<actions::SpawnSpectatorCamera>
+    mut spawn_spectator_camera: EventWriter<actions::SpawnSpectatorCamera>,
 ) {
     keys.get_just_pressed().for_each(|&it| {
         input_bindings.iter()
@@ -69,39 +119,11 @@ fn on_update_keys(
                 }
             });
     });
-
-    keys.get_just_released().for_each(|&it| {
-        input_bindings.iter()
-            .filter(|(&k, _v)| k == it)
-            .map(|(_k, v)| v)
-            .for_each(|action| {
-                match action.as_str() {
-                    default => {}
-                }
-            });
-    });
-
-    keys.get_pressed().for_each(|&it| {
-        input_bindings.iter()
-            .filter(|(&k, _v)| k == it)
-            .map(|(_k, v)| v)
-            .for_each(|action| {
-                match action.as_str() {
-                    "MoveForward" => move_forward.send(actions::MoveForward(1.0)),
-                    "MoveBackward" => move_forward.send(actions::MoveForward(-1.0)),
-                    "StrafeLeft" => move_strafe.send(actions::StrafeRight(-1.0)),
-                    "StrafeRight" => move_strafe.send(actions::StrafeRight(1.0)),
-                    "Crouch" => crouch.send(actions::Crouch(true)),
-                    "Jump" => jump.send(actions::Jump(true)),
-                    default => {}
-                }
-            });
-    });
 }
 
 
 /// Map mouse movement to game Actions!
-fn on_update_mouse(
+fn on_update_mouse_movement(
     input_bindings: Res<InputBindings>,
     mut mouse_motion: EventReader<MouseMotion>,
     mut look_up: EventWriter<actions::LookUp>,

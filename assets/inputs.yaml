@@ -18,6 +18,6 @@
 - binding: ToggleConsole
   key: Grave
 - binding: SpawnCubeActor
-  key: P
+  key: F12
 - binding: SpawnSpectatorCamera
   key: F1

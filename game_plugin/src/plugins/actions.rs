@@ -14,7 +14,6 @@ impl Plugin for ActionsPlugin {
             .add_event::<Crouch>()
             .add_event::<Jump>()
             .add_event::<ToggleConsole>()
-            .add_event::<ProcessConsoleCommand>()
             .add_event::<SpawnCubeActor>()
             .add_event::<SpawnSpectatorCamera>()
         ;
@@ -46,4 +45,5 @@ pub struct SpawnCubeActor;
 pub struct SpawnSpectatorCamera;
 
 pub struct ToggleConsole;
-pub struct ProcessConsoleCommand(pub String);
+
+pub struct ExitGame;
