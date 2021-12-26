@@ -11,7 +11,7 @@ impl Plugin for MyExperimentalPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app
             .insert_resource(get_game_events())
-            .add_event::<MyGameEvent>()
+            .add_event::<MyEventType>()
             .add_system_set(SystemSet::on_update(GameState::Playing)
                 .with_system(handle_spawn_cube.system())
                 .with_system(handle_spawn_sphere.system())
@@ -29,28 +29,25 @@ pub enum MyEventType {
     SPAWN_CAPSULE
 }
 
-pub struct MyGameEvent(MyEventType);
-
-
-fn handle_spawn_cube(mut spawn_cube: EventReader<MyGameEvent>) {
-    spawn_cube.iter().for_each(|it: &MyGameEvent| {
-        if MyEventType::SPAWN_CUBE == it.0 {
+fn handle_spawn_cube(mut spawn_cube: EventReader<MyEventType>) {
+    spawn_cube.iter().for_each(|it: &MyEventType| {
+        if MyEventType::SPAWN_CUBE == *it {
             info!("Spawning cube...");
         }
     });
 }
 
-fn handle_spawn_sphere(mut spawn_sphere: EventReader<MyGameEvent>) {
-    spawn_sphere.iter().for_each(|it: &MyGameEvent| {
-        if MyEventType::SPAWN_SPHERE == it.0 {
+fn handle_spawn_sphere(mut spawn_sphere: EventReader<MyEventType>) {
+    spawn_sphere.iter().for_each(|it: &MyEventType| {
+        if MyEventType::SPAWN_SPHERE == *it {
             info!("Spawning sphere...");
         }
     });
 }
 
-fn handle_spawn_capsule(mut spawn_capsule: EventReader<MyGameEvent>) {
-    spawn_capsule.iter().for_each(|it: &MyGameEvent| {
-        if MyEventType::SPAWN_CAPSULE == it.0 {
+fn handle_spawn_capsule(mut spawn_capsule: EventReader<MyEventType>) {
+    spawn_capsule.iter().for_each(|it: &MyEventType| {
+        if MyEventType::SPAWN_CAPSULE == *it {
             info!("Spawning capsule...");
         }
     });
@@ -60,13 +57,13 @@ fn handle_spawn_capsule(mut spawn_capsule: EventReader<MyGameEvent>) {
 fn handle_inputs(
     keys: Res<Input<KeyCode>>,
     bindings: Res<MyInputBindings>,
-    mut my_game_event: EventWriter<MyGameEvent>,
+    mut my_game_event: EventWriter<MyEventType>,
 ) {
     keys.get_just_pressed()
         .filter(|key: &&KeyCode| bindings.contains_key(key))
         .for_each(|&it| {
             let (key_code, event_type) = bindings.get_key_value(&it).unwrap();
-            my_game_event.send(MyGameEvent(event_type.clone()));
+            my_game_event.send(event_type.clone());
             // match it {
             //     KeyCode::Key1 => { my_game_event.send(MyGameEvent(MyEventType::SPAWN_CUBE)) },
             //     KeyCode::Key2 => { my_game_event.send(MyGameEvent(MyEventType::SPAWN_SPHERE)) },
