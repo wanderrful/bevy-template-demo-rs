@@ -22,7 +22,7 @@ impl Plugin for MyExperimentalPlugin {
     }
 }
 
-#[derive(PartialEq, Clone)]
+#[derive(Clone, PartialEq)]
 pub enum MyEventType {
     SPAWN_CUBE,
     SPAWN_SPHERE,
@@ -64,12 +64,6 @@ fn handle_inputs(
         .for_each(|&it| {
             let (key_code, event_type) = bindings.get_key_value(&it).unwrap();
             my_game_event.send(event_type.clone());
-            // match it {
-            //     KeyCode::Key1 => { my_game_event.send(MyGameEvent(MyEventType::SPAWN_CUBE)) },
-            //     KeyCode::Key2 => { my_game_event.send(MyGameEvent(MyEventType::SPAWN_SPHERE)) },
-            //     KeyCode::Key3 => { my_game_event.send(MyGameEvent(MyEventType::SPAWN_CAPSULE)) },
-            //     _default => {}
-            // }
         });
 }
 
@@ -81,5 +75,8 @@ pub fn get_game_events() -> MyInputBindings {
         (KeyCode::Key1, MyEventType::SPAWN_CUBE),
         (KeyCode::Key2, MyEventType::SPAWN_SPHERE),
         (KeyCode::Key3, MyEventType::SPAWN_CAPSULE),
-    ].iter().cloned().collect()
+    ]
+        .iter()
+        .cloned()
+        .collect()
 }

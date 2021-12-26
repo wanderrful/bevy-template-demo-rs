@@ -16,6 +16,8 @@ impl Plugin for ActionsPlugin {
             .add_event::<ToggleConsole>()
             .add_event::<SpawnCubeActor>()
             .add_event::<SpawnSpectatorCamera>()
+
+            .add_event::<GameActionBinding>()
         ;
     }
 }
@@ -47,3 +49,25 @@ pub struct SpawnSpectatorCamera;
 pub struct ToggleConsole;
 
 pub struct ExitGame;
+
+
+#[derive(serde::Serialize, serde::Deserialize, PartialEq, Clone, Copy, Debug)]
+pub enum GameActionBinding {
+    LookUp,
+    LookRight,
+
+    MoveForward,
+    MoveBackward,
+    StrafeRight,
+    StrafeLeft,
+
+    Crouch,
+    Jump,
+
+    SpawnCubeActor,
+    SpawnSpectatorCamera,
+
+    ToggleConsole,
+
+    ExitGame,
+}

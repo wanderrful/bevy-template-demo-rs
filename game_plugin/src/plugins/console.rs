@@ -4,7 +4,7 @@ use bevy::prelude::*;
 
 use crate::GameState;
 use crate::plugins::actions;
-use crate::plugins::input::InputBindings;
+use crate::plugins::input;
 use crate::plugins::player::Possessed;
 use crate::utils::keys::get_adjusted_user_input;
 
@@ -125,17 +125,17 @@ fn handle_toggle_console(
 /// Populate the Console window with user input text
 fn handle_key_inputs(
     keys: Res<Input<KeyCode>>,
-    input_bindings: Res<InputBindings>,
+    input_bindings: Res<input::InputBindings>,
     mut process_console_command: EventWriter<HandleConsoleCommand>,
     mut console_text_input: Query<&mut Text, With<ConsoleTextInput>>,
     player: Query<Entity, (With<Possessed>, With<IsFocusedOnUI>)>
 ) {
     player.for_each(|_| {
-        let DEFAULT_CONSOLE_KEY: KeyCode = KeyCode::Grave;
-        let (console_key, _): (&KeyCode, &String) = input_bindings.iter()
-            .filter(|(&_k, v)| v.as_str() == "ToggleConsole")
+        const DEFAULT_CONSOLE_KEY: KeyCode = KeyCode::Grave;
+        let (console_key, _): (&KeyCode, &actions::GameActionBinding) = input_bindings.iter()
+            .filter(|(&_k, &v)| v == actions::GameActionBinding::ToggleConsole)
             .next()
-            .unwrap_or((&DEFAULT_CONSOLE_KEY, &"".to_string()));
+            .unwrap_or((&DEFAULT_CONSOLE_KEY, &actions::GameActionBinding::ToggleConsole));
 
         keys.get_just_pressed()
             .filter(|&it| it != console_key)

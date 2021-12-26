@@ -55,6 +55,7 @@ fn handle_game_input(
     mut move_strafe: EventWriter<actions::StrafeRight>,
     mut crouch: EventWriter<actions::Crouch>,
     mut jump: EventWriter<actions::Jump>,
+    mut game_action_binding: EventWriter<actions::GameActionBinding>
 ) {
     player.for_each(|_| {
         keys.get_just_pressed().for_each(|&it| {
@@ -62,9 +63,7 @@ fn handle_game_input(
                 .filter(|(&k, _v)| k == it)
                 .map(|(_k, v)| v)
                 .for_each(|action| {
-                    match action.as_str() {
-                        default => {}
-                    }
+                    // game_action_binding.send(action.clone())
                 });
         });
 
@@ -73,9 +72,7 @@ fn handle_game_input(
                 .filter(|(&k, _v)| k == it)
                 .map(|(_k, v)| v)
                 .for_each(|action| {
-                    match action.as_str() {
-                        default => {}
-                    }
+                    // game_action_binding.send(action.clone())
                 });
         });
 
@@ -84,13 +81,13 @@ fn handle_game_input(
                 .filter(|(&k, _v)| k == it)
                 .map(|(_k, v)| v)
                 .for_each(|action| {
-                    match action.as_str() {
-                        "MoveForward" => move_forward.send(actions::MoveForward(1.0)),
-                        "MoveBackward" => move_forward.send(actions::MoveForward(-1.0)),
-                        "StrafeLeft" => move_strafe.send(actions::StrafeRight(-1.0)),
-                        "StrafeRight" => move_strafe.send(actions::StrafeRight(1.0)),
-                        "Crouch" => crouch.send(actions::Crouch(true)),
-                        "Jump" => jump.send(actions::Jump(true)),
+                    match action {
+                        actions::GameActionBinding::MoveForward => move_forward.send(actions::MoveForward(1.0)),
+                        actions::GameActionBinding::MoveBackward => move_forward.send(actions::MoveForward(-1.0)),
+                        actions::GameActionBinding::StrafeLeft => move_strafe.send(actions::StrafeRight(-1.0)),
+                        actions::GameActionBinding::StrafeRight => move_strafe.send(actions::StrafeRight(1.0)),
+                        actions::GameActionBinding::Crouch => crouch.send(actions::Crouch(true)),
+                        actions::GameActionBinding::Jump => jump.send(actions::Jump(true)),
                         default => {}
                     }
                 });
@@ -111,10 +108,10 @@ fn handle_debug_input(
             .filter(|(&k, _v)| k == it)
             .map(|(_k, v)| v)
             .for_each(|action| {
-                match action.as_str() {
-                    "SpawnCubeActor" => spawn_cube_actor.send(actions::SpawnCubeActor),
-                    "SpawnSpectatorCamera" => spawn_spectator_camera.send(actions::SpawnSpectatorCamera),
-                    "ToggleConsole" => toggle_console.send(actions::ToggleConsole),
+                match action {
+                    actions::GameActionBinding::SpawnCubeActor => spawn_cube_actor.send(actions::SpawnCubeActor),
+                    actions::GameActionBinding::SpawnSpectatorCamera => spawn_spectator_camera.send(actions::SpawnSpectatorCamera),
+                    actions::GameActionBinding::ToggleConsole => toggle_console.send(actions::ToggleConsole),
                     default => {}
                 }
             });
@@ -137,20 +134,21 @@ fn on_update_mouse_movement(
 
 
 /// Wrapper struct for the game's Input Bindings.
-pub type InputBindings = HashMap<KeyCode, String>;
+pub type InputBindings = HashMap<KeyCode, actions::GameActionBinding>;
 
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-struct InputBinding {
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+pub struct InputBinding {
     key: KeyCode,
-    binding: String
+    binding: actions::GameActionBinding,
 }
 
+/// Read input bindings from configuration file
 fn get_input_bindings() -> InputBindings {
     const INPUT_FILE_LOCATION: &str = "assets/inputs.yaml";
     let error_input_file_not_found: String =
-        format!("Input file not found at '{}'!", INPUT_FILE_LOCATION);
+        format!("Input file '{}' was not found!", INPUT_FILE_LOCATION);
     let error_input_file_formatting: String =
-        format!("Input file at '{}' is not formatted properly!", INPUT_FILE_LOCATION);
+        format!("Input file '{}' is not formatted properly!", INPUT_FILE_LOCATION);
 
     let input_bindings: Vec<InputBinding> = serde_yaml::from_reader(
         std::io::BufReader::new(std::fs::File::open(INPUT_FILE_LOCATION)
@@ -158,6 +156,6 @@ fn get_input_bindings() -> InputBindings {
     ).expect(error_input_file_formatting.as_str());
 
     input_bindings.iter()
-        .map(|it| (it.key, String::from(it.binding.as_str())))
+        .map(|it| (it.key, it.binding))
         .collect()
 }
