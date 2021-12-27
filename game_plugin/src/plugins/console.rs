@@ -148,10 +148,10 @@ fn handle_key_inputs(
                     let mut new_value: String = "".to_string();
 
                     // Queue the contents for processing, if it's the Enter button
-                    let should_process_command: bool = !existing_value.is_empty() && *key == KeyCode::Return;
+                    let should_process_command: bool = !existing_value.is_empty()
+                        && *key == KeyCode::Return;
                     if should_process_command {
-                        process_console_command.send(
-                            HandleConsoleCommand(existing_value));
+                        process_console_command.send(HandleConsoleCommand(existing_value));
                     } else {
                         new_value = get_adjusted_user_input(existing_value, key);
                     }
@@ -247,7 +247,12 @@ fn create_text_input(background_color: Handle<ColorMaterial>) -> NodeBundle {
             flex_direction: FlexDirection::Row,
             justify_content: JustifyContent::FlexStart,
             align_items: AlignItems::Center,
-            padding: Rect::all(Val::Px(2.0)),
+            padding: Rect {
+                top: Val::Px(2.0),
+                bottom: Val::Px(2.0),
+                left: Val::Px(8.0),
+                right: Val::Px(8.0)
+            },
             ..Default::default()
         },
         material: background_color,
@@ -294,12 +299,12 @@ fn create_log_panel(background_color: Handle<ColorMaterial>) -> NodeBundle {
     }
 }
 
-fn create_log_line(font: &Handle<Font>, value: String) -> TextBundle {
+fn create_log_line(font: &Handle<Font>, message: String) -> TextBundle {
     TextBundle {
         text: Text {
             sections: vec![
                 TextSection {
-                    value,
+                    value: message,
                     style: TextStyle {
                         font: font.as_weak(),
                         ..Default::default()
